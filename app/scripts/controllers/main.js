@@ -1,24 +1,44 @@
 'use strict';
 
 angular.module('geolfApp')
-  .controller('MainCtrl', function ($scope, geotracker, places, mapping) {
-    $scope.placesService = places;
+  .controller('MainCtrl', function ($scope, geotracker, geomath, places, mapping) {
+        $scope.state = "Initializing";
 
-    $scope.init = function() {
-        geotracker.start();
-    }
+        /**
+         * constructor
+         */
+        $scope.init = function() {
+            geotracker.start();
+        }
 
-    $scope.initializeGreen = function() {
-        mapping.create();
-        mapping.addMarker("me", "me", geotracker.geo.coords);
-        places.search(500, $scope.onPlaces);
-    }
+        /**
+         * initialize golf green around user's location
+         */
+        $scope.initializeGreen = function() {
+            $scope.state = "Initializing";
+            mapping.create();
+            mapping.addMarker("me", "me", geotracker.geo.coords);
+            places.search(500, $scope.onPlaces);
+        }
 
-    $scope.onPlaces = function() {
-        var hole = places.getFarthest();
-        mapping.addMarker("loc", hole.name, hole.location);
-        $scope.$apply();
-    }
+        /**
+         * swing golf club
+         */
+        $scope.swing = function(power, angle) {
+            var coords = geomath.projectOut(geotracker.geo.coords, 500, 29);
+            mapping.addMarker("ball", "ball", coords);
+        }
 
-    $scope.init();
+        /**
+         * on place retrieval
+         */
+        $scope.onPlaces = function() {
+            $scope.state = "GamePlay";
+            var hole = places.getFarthest();
+            mapping.addMarker("loc", hole.name, hole.location);
+            $scope.$apply();
+        }
+
+        /** call c-tor */
+        $scope.init();
   });

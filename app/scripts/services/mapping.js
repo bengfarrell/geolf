@@ -57,9 +57,9 @@ angular.module('geolfApp').service('mapping', function($http, geotracker) {
                         new google.maps.Size(40, 60)
                     )
                 });
-            case "loc":
+            default:
                 return new google.maps.Marker({
-                    map: self.map,
+                    map: self.map
                 });
 
         }

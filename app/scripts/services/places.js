@@ -1,4 +1,4 @@
-angular.module('geolfApp').service('places', function($http, geotracker, mapping) {
+angular.module('geolfApp').service('places', function($http, geotracker, geomath, mapping) {
     var self = this;
 
     /** list of places found */
@@ -61,27 +61,9 @@ angular.module('geolfApp').service('places', function($http, geotracker, mapping
             return;
         }
         self.places.forEach(function(loc) {
-            var R = 6371000; // meters
-            var dLat = self.toRad(loc.location.latitude - geotracker.geo.coords.latitude);
-            var dLon = self.toRad(loc.location.longitude - geotracker.geo.coords.longitude);
-            var lat1 = self.toRad(geotracker.geo.coords.latitude);
-            var lat2 = self.toRad(loc.location.latitude);
-
-            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            loc.distance = parseInt(R * c);
+            loc.distance = geomath.calculateDistance(loc.location, geotracker.geo.coords);
         });
         self.sortByProximity();
-    }
-
-    /**
-     * math util to convert lat/long to radians
-     * @param value
-     * @returns {number}
-     */
-    this.toRad = function(value) {
-        return value * Math.PI / 180;
     }
 
     /**
