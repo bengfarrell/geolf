@@ -29,6 +29,7 @@ app.service('geomath', function() {
     this.projectOut = function(geo, d, brng) {
         var lat1 = self.toRad(geo.latitude);
         var lon1 = self.toRad(geo.longitude);
+        var brng = self.toRad(brng);
         var lat2 = Math.asin( Math.sin(lat1)*Math.cos(d/R) +
             Math.cos(lat1)*Math.sin(d/R)*Math.cos(brng) );
         var lon2 = lon1 + Math.atan2(Math.sin(brng)*Math.sin(d/R)*Math.cos(lat1),

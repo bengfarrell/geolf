@@ -8,7 +8,8 @@ app.service('mapping', function($http, geotracker, geomath) {
     this.config = {
         zoom: 19,
         mapTypeId: google.maps.MapTypeId.SATELLITE,
-        disableDefaultUI: true
+        disableDefaultUI: true,
+        animationSteps: 100
     };
 
     /**
@@ -25,6 +26,32 @@ app.service('mapping', function($http, geotracker, geomath) {
         var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
         self.markers[name].setPosition(latlng);
         return { marker: self.markers[name], coords: coords};
+    }
+
+    /**
+     * animate marker to a position based on distance and angle
+     * @param ref
+     * @param distance
+     * @param angle
+     */
+    this.animateMarkerBy = function(ref, distance, angle, callback) {
+        var distance_step = distance / self.config.animationSteps;
+        var frames = [];
+        for (var c = 0; c < self.config.animationSteps; c++) {
+            frames.push(geomath.projectOut(ref.coords, distance_step * c, angle));
+        }
+        frames.reverse();
+
+        requestAnimationFrame(function() {
+            if (frames.length == 0) {
+                if (callback) {
+                    callback.apply(this);
+                }
+                return;
+            }
+            self.moveMarkerTo(ref, frames.pop());
+            requestAnimationFrame(arguments.callee);
+        });
     }
 
     /**

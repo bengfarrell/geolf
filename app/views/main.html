@@ -15,12 +15,12 @@
     </button>
 
     <label>
-        Angle
+        Angle <span>{{direction}}</span>
         <input type="range" ng-model="direction" name="angle" min="0" max="360" ng-init="direction=0">
     </label>
 
     <label>
-        Power
+        Power <span>{{power}}</span>
         <input type="range" ng-model="power" name="power" min="0" max="500" ng-init="power=0">
     </label>
 
