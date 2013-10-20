@@ -1,7 +1,5 @@
 'use strict';
-
-angular.module('geolfApp')
-  .controller('MainCtrl', function ($scope, geotracker, geomath, places, mapping) {
+app.controller('MainCtrl', function ($scope, geotracker, places, mapping) {
         $scope.state = "Initializing";
 
         /**
@@ -17,16 +15,18 @@ angular.module('geolfApp')
         $scope.initializeGreen = function() {
             $scope.state = "Initializing";
             mapping.create();
-            mapping.addMarker("me", "me", geotracker.geo.coords);
+            mapping.addMarker("me", "me");
             places.search(500, $scope.onPlaces);
         }
 
         /**
          * swing golf club
          */
-        $scope.swing = function(power, angle) {
-            var coords = geomath.projectOut(geotracker.geo.coords, 500, 29);
-            mapping.addMarker("ball", "ball", coords);
+        $scope.swing = function() {
+            if (!$scope.ball) {
+                $scope.ball = mapping.addMarker("ball", "ball");
+            }
+            mapping.moveMarkerBy($scope.ball, $scope.power, $scope.direction);
         }
 
         /**

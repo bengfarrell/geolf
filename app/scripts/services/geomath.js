@@ -1,4 +1,4 @@
-angular.module('geolfApp').service('geomath', function() {
+app.service('geomath', function() {
     var self = this;
     var R = 6371000; // earth's radius in meters
 

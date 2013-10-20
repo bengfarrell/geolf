@@ -1,4 +1,4 @@
-angular.module('geolfApp').service('places', function($http, geotracker, geomath, mapping) {
+app.service('places', function($http, geotracker, geomath, mapping) {
     var self = this;
 
     /** list of places found */

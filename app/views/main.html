@@ -13,4 +13,16 @@
         class="btn btn-primary State Container_GamePlay {{state}}">
         Swing
     </button>
+
+    <label>
+        Angle
+        <input type="range" ng-model="direction" name="angle" min="0" max="360" ng-init="direction=0">
+    </label>
+
+    <label>
+        Power
+        <input type="range" ng-model="power" name="power" min="0" max="500" ng-init="power=0">
+    </label>
+
+    <compass class="arrow" direction="{{direction}}"></compass>
 </div>

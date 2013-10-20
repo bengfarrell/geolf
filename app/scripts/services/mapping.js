@@ -1,4 +1,4 @@
-angular.module('geolfApp').service('mapping', function($http, geotracker) {
+app.service('mapping', function($http, geotracker, geomath) {
     var self = this;
 
     /** markers by name */
@@ -18,9 +18,34 @@ angular.module('geolfApp').service('mapping', function($http, geotracker) {
      * @param coords
      */
     this.addMarker = function(type, name, coords) {
+        if (!coords) {
+            coords = geotracker.geo.coords;
+        }
         self.markers[name] = self._markerFactory(type);
         var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
         self.markers[name].setPosition(latlng);
+        return { marker: self.markers[name], coords: coords};
+    }
+
+    /**
+     * move marker to coordinates
+     * @param ref
+     * @param coords
+     */
+    this.moveMarkerTo = function(ref, coords) {
+        ref.marker.setPosition(new google.maps.LatLng(coords.latitude, coords.longitude));
+        ref.coords = coords;
+    }
+
+    /**
+     * move marker by a specific distance at a specific angle
+     * @param ref
+     * @param distance
+     * @param angle
+     */
+    this.moveMarkerBy = function(ref, distance, angle) {
+        var moveto = geomath.projectOut(ref.coords, distance, angle);
+        this.moveMarkerTo(ref, moveto);
     }
 
     /**
@@ -57,6 +82,19 @@ angular.module('geolfApp').service('mapping', function($http, geotracker) {
                         new google.maps.Size(40, 60)
                     )
                 });
+
+            case "ball":
+                return new google.maps.Marker({
+                    map: self.map,
+                    icon: new google.maps.MarkerImage(
+                        'assets/golf-ball.png',
+                        new google.maps.Size(15, 15),
+                        new google.maps.Point(0, 0),
+                        new google.maps.Point(Math.floor(15/2), Math.floor(15/2)),
+                        new google.maps.Size(15, 15)
+                    )
+                });
+
             default:
                 return new google.maps.Marker({
                     map: self.map

@@ -1,7 +1,7 @@
 'use strict';
+var app = angular.module('geolfApp', []);
 
-angular.module('geolfApp', [])
-  .config(function ($routeProvider) {
+app.config(function ($routeProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',

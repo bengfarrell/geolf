@@ -1,4 +1,4 @@
-angular.module('geolfApp').service('geotracker', function() {
+app.service('geotracker', function() {
     var self = this;
 
     this.config = {
