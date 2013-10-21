@@ -289,7 +289,7 @@ module.exports = function (grunt) {
           },
           src: 'dist',
           dest: '/htdocs/sweatintotheweb.com/experiments/geolf',
-          exclusions: []
+          exclusions: ['bower_components']
       }
     }
   });
