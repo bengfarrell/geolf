@@ -26,7 +26,14 @@ app.controller('MainCtrl', function ($scope, geotracker, places, mapping) {
             if (!$scope.ball) {
                 $scope.ball = mapping.addMarker("ball", "ball");
             }
-            mapping.animateMarkerBy($scope.ball, $scope.power, $scope.direction);
+
+            $scope.state = "animating";
+            mapping.animateMarkerBy(
+                $scope.ball, $scope.power,
+                $scope.direction, {animation: "arc"}, function() {
+                $scope.state = "GamePlay";
+                $scope.$apply();
+            });
         }
 
         /**

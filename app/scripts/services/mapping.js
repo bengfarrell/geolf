@@ -34,11 +34,16 @@ app.service('mapping', function($http, geotracker, geomath) {
      * @param distance
      * @param angle
      */
-    this.animateMarkerBy = function(ref, distance, angle, callback) {
+    this.animateMarkerBy = function(ref, distance, angle, config, callback) {
         var distance_step = distance / self.config.animationSteps;
         var frames = [];
         for (var c = 0; c < self.config.animationSteps; c++) {
-            frames.push(geomath.projectOut(ref.coords, distance_step * c, angle));
+            var obj = {};
+            obj.coords = geomath.projectOut(ref.coords, distance_step * c, angle);
+            if (config.animation = "arc") {
+                obj.size = ref.marker.icon.size.width * Math.sin(c / self.config.animationSteps * Math.PI) + ref.marker.icon.size.width
+            }
+            frames.push(obj);
         }
         frames.reverse();
 
@@ -49,7 +54,12 @@ app.service('mapping', function($http, geotracker, geomath) {
                 }
                 return;
             }
-            self.moveMarkerTo(ref, frames.pop());
+            var f = frames.pop();
+            if (f.size) {
+                ref.marker.icon.scaledSize = new google.maps.Size(f.size, f.size);
+                ref.marker.icon.size = new google.maps.Size(f.size, f.size);
+            }
+            self.moveMarkerTo(ref, f.coords);
             requestAnimationFrame(arguments.callee);
         });
     }
