@@ -279,6 +279,18 @@ module.exports = function (grunt) {
           ]
         }
       }
+    },
+    'ftp-deploy': {
+      build: {
+          auth: {
+              host: 'ftp.blastanova.com',
+              port: 21,
+              authKey: 'key1'
+          },
+          src: 'build',
+          dest: '/htdocs/sweatintotheweb.com/experiments/geolf',
+          exclusions: []
+      }
     }
   });
 
