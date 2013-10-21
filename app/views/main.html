@@ -1,13 +1,15 @@
 <div class="hero-unit">
-  <h1>'Allo, 'Allo!</h1>
+  <h1>
+      Geolf
+      <button
+              ng-click="initializeGreen()"
+              class="btn btn-primary State Container_Initializing {{state}}">
+          Start Game
+      </button>
+
+  </h1>
+
     <div id="map-canvas" class="map"></div>
-
-    <button
-        ng-click="initializeGreen()"
-        class="btn btn-primary State Container_Initializing {{state}}">
-        Start Game
-    </button>
-
     <button
         ng-click="swing()"
         class="btn btn-primary State Container_GamePlay {{state}}">
