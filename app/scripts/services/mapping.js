@@ -12,8 +12,8 @@ app.service('mapping', function($http, geotracker, geomath) {
             disableDefaultUI: true
         },
         animationSteps: 100,
-        closeUpZoom: 19,
-        cameraAnimationSteps: 200
+        closeUpZoom: 20,
+        cameraAnimationSteps: 100
     };
 
     /**
@@ -46,13 +46,17 @@ app.service('mapping', function($http, geotracker, geomath) {
         for (var c = 0; c < self.config.cameraAnimationSteps; c++) {
             var obj = {};
             obj.coords = geomath.projectOut(self.map.getCenter(), distance_step * c, bearing+180);
+            frames.push(obj);
+        }
+        for (var c = 0; c < self.config.cameraAnimationSteps; c++) {
+            var obj = {};
             if (config.animation = "arc") {
                 obj.zoom = parseInt(self.map.getZoom() + (self.config.closeUpZoom - self.map.getZoom()) * Math.sin(c / self.config.cameraAnimationSteps * Math.PI/2));
             }
             frames.push(obj);
         }
         if (config.returnToOriginal == true) {
-            frames.push({ pause: 50 });
+            frames.push({ pause: 20 });
             frames = frames.concat(frames.slice(0).reverse());
         }
         self._startAnimation(frames, "camera", self.map, callback);
@@ -161,7 +165,9 @@ app.service('mapping', function($http, geotracker, geomath) {
                         target.setZoom(f.zoom);
                     }
 
-                    target.panTo( new google.maps.LatLng(f.coords.latitude, f.coords.longitude) );
+                    if (f.coords) {
+                        target.panTo( new google.maps.LatLng(f.coords.latitude, f.coords.longitude) );
+                    }
                     break;
             }
             requestAnimationFrame(animf);
