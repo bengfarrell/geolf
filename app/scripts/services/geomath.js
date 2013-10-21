@@ -21,6 +21,25 @@ app.service('geomath', function() {
     }
 
     /**
+     * calculate bearing between two coordinates
+     * @param geo1
+     * @param geo2
+     * @returns {*}
+     */
+    this.calculateBearing = function(geo1, geo2) {
+        var dLat = self.toRad(geo1.latitude - geo2.latitude);
+        var dLon = self.toRad(geo1.longitude - geo2.longitude);
+        var lat1 = self.toRad(geo2.latitude);
+        var lat2 = self.toRad(geo1.latitude);
+
+        var y = Math.sin(dLon) * Math.cos(lat2);
+        var x = Math.cos(lat1)*Math.sin(lat2) -
+            Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+        var brng = self.toDeg(Math.atan2(y, x));
+        return brng;
+    }
+
+    /**
      * get coords from projecting out from location at a certain distance and angle
      * @param geo
      * @param distance

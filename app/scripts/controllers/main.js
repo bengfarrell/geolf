@@ -1,5 +1,5 @@
 'use strict';
-app.controller('MainCtrl', function ($scope, geotracker, places, mapping) {
+app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mapping) {
         $scope.state = "Initializing";
 
         /**
@@ -31,9 +31,11 @@ app.controller('MainCtrl', function ($scope, geotracker, places, mapping) {
             mapping.animateMarkerBy(
                 $scope.ball, $scope.power,
                 $scope.direction, {animation: "arc"}, function() {
-                $scope.state = "GamePlay";
-                $scope.$apply();
-            });
+                    $scope.state = "GamePlay";
+                    $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
+                    $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
+                    $scope.$apply();
+                });
         }
 
         /**

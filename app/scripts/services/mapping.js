@@ -6,7 +6,7 @@ app.service('mapping', function($http, geotracker, geomath) {
 
     /** configuration for maps */
     this.config = {
-        zoom: 19,
+        zoom: 16,
         mapTypeId: google.maps.MapTypeId.SATELLITE,
         disableDefaultUI: true,
         animationSteps: 100
