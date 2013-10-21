@@ -281,13 +281,13 @@ module.exports = function (grunt) {
       }
     },
     'ftp-deploy': {
-      build: {
+      default: {
           auth: {
               host: 'ftp.blastanova.com',
               port: 21,
               authKey: 'key1'
           },
-          src: 'build',
+          src: 'dist',
           dest: '/htdocs/sweatintotheweb.com/experiments/geolf',
           exclusions: []
       }
@@ -307,17 +307,17 @@ module.exports = function (grunt) {
       'open',
       'watch'
     ]);
-  });
+    });
 
-  grunt.registerTask('test', [
+    grunt.registerTask('test', [
     'clean:server',
     'concurrent:test',
     'autoprefixer',
     'connect:test',
     'karma'
-  ]);
+    ]);
 
-  grunt.registerTask('build', [
+    grunt.registerTask('build', [
     'clean:dist',
     'useminPrepare',
     'concurrent:dist',
@@ -330,9 +330,14 @@ module.exports = function (grunt) {
     'uglify',
     'rev',
     'usemin'
-  ]);
+    ]);
 
-  grunt.registerTask('default', [
+    grunt.registerTask('default', [
     'build'
-  ]);
+    ]);
+
+    grunt.registerTask('deploy', [
+        'build',
+        'ftp-deploy'
+    ]);
 };
