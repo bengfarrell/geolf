@@ -6,9 +6,11 @@ app.service('mapping', function($http, geotracker, geomath) {
 
     /** configuration for maps */
     this.config = {
-        zoom: 16,
-        mapTypeId: google.maps.MapTypeId.SATELLITE,
-        disableDefaultUI: true,
+        google: {
+            zoom: 16,
+            mapTypeId: google.maps.MapTypeId.SATELLITE,
+            disableDefaultUI: true
+        },
         animationSteps: 100,
         closeUpZoom: 19,
         cameraAnimationSteps: 200
@@ -105,12 +107,12 @@ app.service('mapping', function($http, geotracker, geomath) {
      */
     this.create = function(center) {
         if (center) {
-            self.config.center = center;
+            self.config.google.center = center;
         } else {
             var ll = new google.maps.LatLng(geotracker.geo.coords.latitude, geotracker.geo.coords.longitude)
-            self.config.center = ll;
+            self.config.google.center = ll;
         }
-        self.map = new google.maps.Map(document.getElementById('map-canvas'), self.config);
+        self.map = new google.maps.Map(document.getElementById('map-canvas'), self.config.google);
         return self.map;
     }
 
