@@ -125,10 +125,10 @@ app.service('mapping', function($http, geotracker, geomath) {
     this._startAnimation = function(frames, targetType, target, callback) {
         var pause = 0;
         var lastZoom = 0;
-        requestAnimationFrame(function() {
+        var animf = function() {
             if (pause > 0) {
                 pause --;
-                requestAnimationFrame(arguments.callee);
+                requestAnimationFrame(animf);
                 return;
             }
             if (frames.length == 0) {
@@ -140,7 +140,7 @@ app.service('mapping', function($http, geotracker, geomath) {
             var f = frames.pop();
             if (f.pause) {
                 pause = f.pause-1;
-                requestAnimationFrame(arguments.callee);
+                requestAnimationFrame(animf);
                 return;
             }
 
@@ -162,8 +162,9 @@ app.service('mapping', function($http, geotracker, geomath) {
                     target.panTo( new google.maps.LatLng(f.coords.latitude, f.coords.longitude) );
                     break;
             }
-            requestAnimationFrame(arguments.callee);
-        });
+            requestAnimationFrame(animf);
+        };
+        requestAnimationFrame(animf);
     }
 
     /**
@@ -177,7 +178,7 @@ app.service('mapping', function($http, geotracker, geomath) {
                 return new google.maps.Marker({
                     map: self.map,
                     icon: new google.maps.MarkerImage(
-                        'assets/golfer.png',
+                        'images/golfer.png',
                         new google.maps.Size(40, 60),
                         new google.maps.Point(0, 0),
                         new google.maps.Point(Math.floor(40/2), Math.floor(60/2)),
@@ -189,7 +190,7 @@ app.service('mapping', function($http, geotracker, geomath) {
                 return new google.maps.Marker({
                     map: self.map,
                     icon: new google.maps.MarkerImage(
-                        'assets/golf-ball.png',
+                        'images/golf-ball.png',
                         new google.maps.Size(15, 15),
                         new google.maps.Point(0, 0),
                         new google.maps.Point(Math.floor(15/2), Math.floor(15/2)),

@@ -128,30 +128,7 @@ module.exports = function (grunt) {
         '<%= yeoman.app %>/scripts/{,*/}*.js'
       ]
     },
-    coffee: {
-      options: {
-        sourceMap: true,
-        sourceRoot: ''
-      },
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '<%= yeoman.app %>/scripts',
-          src: '{,*/}*.coffee',
-          dest: '.tmp/scripts',
-          ext: '.js'
-        }]
-      },
-      test: {
-        files: [{
-          expand: true,
-          cwd: 'test/spec',
-          src: '{,*/}*.coffee',
-          dest: '.tmp/spec',
-          ext: '.js'
-        }]
-      }
-    },
+
     // not used since Uglify task does concat,
     // but still available if needed
     /*concat: {
@@ -163,8 +140,6 @@ module.exports = function (grunt) {
           src: [
             '<%= yeoman.dist %>/scripts/{,*/}*.js',
             '<%= yeoman.dist %>/styles/{,*/}*.css',
-            '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-            '<%= yeoman.dist %>/styles/fonts/*'
           ]
         }
       }
@@ -269,26 +244,17 @@ module.exports = function (grunt) {
     },
     concurrent: {
       server: [
-        'coffee:dist',
         'copy:styles'
       ],
       test: [
-        'coffee',
         'copy:styles'
       ],
       dist: [
-        'coffee',
         'copy:styles',
         'imagemin',
         'svgmin',
         'htmlmin'
       ]
-    },
-    karma: {
-      unit: {
-        configFile: 'karma.conf.js',
-        singleRun: true
-      }
     },
     cdnify: {
       dist: {
@@ -355,8 +321,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'jshint',
-    'test',
     'build'
   ]);
 };
