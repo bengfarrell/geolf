@@ -20,8 +20,9 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
         }
 
         $scope.findBall = function() {
+            $scope.state = 'Animating';
             mapping.animateCameraTo($scope.ball.coords, {animation: 'arc', returnToOriginal: true}, function() {
-                console.log('done')
+                $scope.state = 'GamePlay';
             });
         }
 
@@ -33,7 +34,7 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
                 $scope.ball = mapping.addMarker('ball', 'ball');
             }
 
-            $scope.state = 'animating';
+            $scope.state = 'Animating';
             mapping.animateMarkerBy(
                 $scope.ball, $scope.power,
                 $scope.direction, {animation: 'arc'}, function() {
