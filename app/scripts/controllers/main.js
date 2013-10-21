@@ -19,6 +19,12 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
             places.search(500, $scope.onPlaces);
         }
 
+        $scope.findBall = function() {
+            mapping.animateCameraTo($scope.ball.coords, {animation: "arc", returnToOriginal: true}, function() {
+                console.log("done")
+            });
+        }
+
         /**
          * swing golf club
          */

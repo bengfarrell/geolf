@@ -9,6 +9,7 @@ app.service('geomath', function() {
      * @returns {Number}
      */
     this.calculateDistance = function(geo1, geo2) {
+        self.convertFromGoogle([geo1, geo2]);
         var dLat = self.toRad(geo1.latitude - geo2.latitude);
         var dLon = self.toRad(geo1.longitude - geo2.longitude);
         var lat1 = self.toRad(geo2.latitude);
@@ -27,6 +28,7 @@ app.service('geomath', function() {
      * @returns {*}
      */
     this.calculateBearing = function(geo1, geo2) {
+        self.convertFromGoogle([geo1, geo2]);
         var dLat = self.toRad(geo1.latitude - geo2.latitude);
         var dLon = self.toRad(geo1.longitude - geo2.longitude);
         var lat1 = self.toRad(geo2.latitude);
@@ -46,6 +48,7 @@ app.service('geomath', function() {
      * @param bearing
      */
     this.projectOut = function(geo, d, brng) {
+        self.convertFromGoogle([geo]);
         var lat1 = self.toRad(geo.latitude);
         var lon1 = self.toRad(geo.longitude);
         var brng = self.toRad(brng);
@@ -55,6 +58,18 @@ app.service('geomath', function() {
             Math.cos(d/R)-Math.sin(lat1)*Math.sin(lat2));
 
         return { latitude: self.toDeg(lat2), longitude: self.toDeg(lon2) };
+    }
+
+    /**
+     * convert from google lat/long object
+     */
+    this.convertFromGoogle = function(llobjs) {
+       llobjs.forEach( function(llo) {
+           if (llo.lb && llo.mb) {
+               llo.latitude = llo.lb;
+               llo.longitude = llo.mb;
+           }
+       });
     }
 
     /**

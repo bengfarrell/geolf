@@ -9,7 +9,9 @@ app.service('mapping', function($http, geotracker, geomath) {
         zoom: 16,
         mapTypeId: google.maps.MapTypeId.SATELLITE,
         disableDefaultUI: true,
-        animationSteps: 100
+        animationSteps: 100,
+        closeUpZoom: 19,
+        cameraAnimationSteps: 200
     };
 
     /**
@@ -26,6 +28,32 @@ app.service('mapping', function($http, geotracker, geomath) {
         var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
         self.markers[name].setPosition(latlng);
         return { marker: self.markers[name], coords: coords};
+    }
+
+    /**
+     * animate camera to geoposition
+     * @param coords
+     * @param config
+     * @param callback
+     */
+    this.animateCameraTo = function(coords, config, callback) {
+        var distance = geomath.calculateDistance(self.map.getCenter(), coords);
+        var bearing = geomath.calculateBearing(self.map.getCenter(), coords);
+        var distance_step = distance / self.config.cameraAnimationSteps;
+        var frames = [];
+        for (var c = 0; c < self.config.cameraAnimationSteps; c++) {
+            var obj = {};
+            obj.coords = geomath.projectOut(self.map.getCenter(), distance_step * c, bearing+180);
+            if (config.animation = "arc") {
+                obj.zoom = parseInt(self.map.getZoom() + (self.config.closeUpZoom - self.map.getZoom()) * Math.sin(c / self.config.cameraAnimationSteps * Math.PI/2));
+            }
+            frames.push(obj);
+        }
+        if (config.returnToOriginal == true) {
+            frames.push({ pause: 50 });
+            frames = frames.concat(frames.slice(0).reverse());
+        }
+        self._startAnimation(frames, "camera", self.map, callback);
     }
 
     /**
@@ -46,22 +74,7 @@ app.service('mapping', function($http, geotracker, geomath) {
             frames.push(obj);
         }
         frames.reverse();
-
-        requestAnimationFrame(function() {
-            if (frames.length == 0) {
-                if (callback) {
-                    callback.apply(this);
-                }
-                return;
-            }
-            var f = frames.pop();
-            if (f.size) {
-                ref.marker.icon.scaledSize = new google.maps.Size(f.size, f.size);
-                ref.marker.icon.size = new google.maps.Size(f.size, f.size);
-            }
-            self.moveMarkerTo(ref, f.coords);
-            requestAnimationFrame(arguments.callee);
-        });
+        self._startAnimation(frames, "marker", ref, callback);
     }
 
     /**
@@ -99,6 +112,58 @@ app.service('mapping', function($http, geotracker, geomath) {
         }
         self.map = new google.maps.Map(document.getElementById('map-canvas'), self.config);
         return self.map;
+    }
+
+    /**
+     * start animation against a frame list
+     * @param frames
+     * @param targetType
+     * @param target
+     * @param callback
+     * @private
+     */
+    this._startAnimation = function(frames, targetType, target, callback) {
+        var pause = 0;
+        var lastZoom = 0;
+        requestAnimationFrame(function() {
+            if (pause > 0) {
+                pause --;
+                requestAnimationFrame(arguments.callee);
+                return;
+            }
+            if (frames.length == 0) {
+                if (callback) {
+                    callback.apply(this);
+                }
+                return;
+            }
+            var f = frames.pop();
+            if (f.pause) {
+                pause = f.pause-1;
+                requestAnimationFrame(arguments.callee);
+                return;
+            }
+
+            switch (targetType) {
+                case "marker":
+                    if (f.size) {
+                        target.marker.icon.scaledSize = new google.maps.Size(f.size, f.size);
+                        target.marker.icon.size = new google.maps.Size(f.size, f.size);
+                    }
+                    self.moveMarkerTo(target, f.coords);
+                    break;
+
+                case "camera":
+                    if (f.zoom && f.zoom != lastZoom) {
+                        lastZoom = f.zoom;
+                        target.setZoom(f.zoom);
+                    }
+
+                    target.panTo( new google.maps.LatLng(f.coords.latitude, f.coords.longitude) );
+                    break;
+            }
+            requestAnimationFrame(arguments.callee);
+        });
     }
 
     /**

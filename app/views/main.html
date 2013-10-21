@@ -14,6 +14,12 @@
         Swing
     </button>
 
+    <button
+        ng-click="findBall()"
+        class="btn btn-primary State Container_GamePlay {{state}}">
+        Find Ball
+    </button>
+
     <label>
         Angle <span>{{direction}}</span>
         <input type="range" ng-model="direction" name="angle" min="0" max="360" ng-init="direction=0">
