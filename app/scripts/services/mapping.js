@@ -117,6 +117,10 @@ app.service('mapping', function($http, geotracker, geomath) {
             self.config.google.center = ll;
         }
         self.map = new google.maps.Map(document.getElementById('map-canvas'), self.config.google);
+
+        geotracker.subscribe(function(geo) {
+            self.map.setCenter(new google.maps.LatLng(geo.coords.latitude, geo.coords.longitude));
+        });
         return self.map;
     }
 

@@ -11,6 +11,7 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
             if ($scope.ball) {
                 $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
                 $scope.ball.inRange = ($scope.ball.distanceTo < 10);
+                mapping.moveMarkerTo($scope.golfer, geotracker.geo.coords);
             }
         });
     }
@@ -21,7 +22,7 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
     $scope.initializeGreen = function() {
         $scope.state = 'Initializing';
         mapping.create();
-        mapping.addMarker('me', 'me');
+        $scope.golfer = mapping.addMarker('me', 'me');
         $scope.ball = mapping.addMarker('ball', 'ball');
         $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
         $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
