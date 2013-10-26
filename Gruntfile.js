@@ -19,7 +19,8 @@ module.exports = function (grunt) {
   // configurable paths
   var yeomanConfig = {
     app: 'app',
-    dist: 'dist'
+    dist: 'dist',
+    mobiledist: 'mobile'
   };
 
   try {
@@ -107,17 +108,29 @@ module.exports = function (grunt) {
       }
     },
     clean: {
-      dist: {
-        files: [{
-          dot: true,
-          src: [
-            '.tmp',
-            '<%= yeoman.dist %>/*',
-            '!<%= yeoman.dist %>/.git*'
-          ]
-        }]
-      },
-      server: '.tmp'
+        dist: {
+            files: [{
+              dot: true,
+              src: [
+                '.tmp',
+                '<%= yeoman.dist %>/*',
+                '!<%= yeoman.dist %>/.git*'
+              ]
+            }]
+        },
+        mobile: {
+            files: [{
+                dot: true,
+                src: [
+                    '<%= yeoman.mobiledist %>/www/style',
+                    '<%= yeoman.mobiledist %>/www/script',
+                    '<%= yeoman.mobiledist %>/www/images',
+                    '<%= yeoman.mobiledist %>/www/views',
+                    '<%= yeoman.mobiledist %>/www/index.html'
+                ]
+            }]
+        },
+        server: '.tmp'
     },
     jshint: {
       options: {
@@ -213,34 +226,48 @@ module.exports = function (grunt) {
     },
     // Put files not handled in other tasks here
     copy: {
-      dist: {
-        files: [{
-          expand: true,
-          dot: true,
-          cwd: '<%= yeoman.app %>',
-          dest: '<%= yeoman.dist %>',
-          src: [
-            '*.{ico,png,txt}',
-            '.htaccess',
-            'bower_components/**/*',
-            'images/{,*/}*.{gif,webp}',
-            'styles/fonts/*'
-          ]
-        }, {
-          expand: true,
-          cwd: '.tmp/images',
-          dest: '<%= yeoman.dist %>/images',
-          src: [
-            'generated/*'
-          ]
-        }]
-      },
-      styles: {
-        expand: true,
-        cwd: '<%= yeoman.app %>/styles',
-        dest: '.tmp/styles/',
-        src: '{,*/}*.css'
-      }
+        dist: {
+            files: [{
+              expand: true,
+              dot: true,
+              cwd: '<%= yeoman.app %>',
+              dest: '<%= yeoman.dist %>',
+              src: [
+                'libs/angular/angular.min.js',
+              ]
+            },
+            {
+                expand: true,
+                dot: true,
+                cwd: '<%= yeoman.app %>',
+                dest: '<%= yeoman.dist %>',
+                src: [
+                    '*.{ico,png,txt}',
+                    '.htaccess',
+                    'images/{,*/}*.{gif,webp}',
+                    'styles/fonts/*'
+                ]
+            }, {
+              expand: true,
+              cwd: '.tmp/images',
+              dest: '<%= yeoman.dist %>/images',
+              src: [
+                'generated/*'
+              ]
+            }]
+        },
+        styles: {
+            expand: true,
+            cwd: '<%= yeoman.app %>/styles',
+            dest: '.tmp/styles/',
+            src: '{,*/}*.css'
+        },
+        mobile: {
+            expand: true,
+            cwd: 'dist/',
+            src: ['**', '!bower_components/**', '!404.html', '!spec.html', '!robots.txt', '!favicon.ico'],
+            dest: 'mobile/www/'
+        }
     },
     concurrent: {
       server: [
@@ -255,11 +282,6 @@ module.exports = function (grunt) {
         'svgmin',
         'htmlmin'
       ]
-    },
-    cdnify: {
-      dist: {
-        html: ['<%= yeoman.dist %>/*.html']
-      }
     },
     ngmin: {
       dist: {
@@ -324,7 +346,6 @@ module.exports = function (grunt) {
     'autoprefixer',
     'concat',
     'copy:dist',
-    'cdnify',
     'ngmin',
     'cssmin',
     'uglify',
@@ -333,7 +354,12 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('default', [
-    'build'
+        'build'
+    ]);
+
+    grunt.registerTask('mobile', [
+        'clean:mobile',
+        'copy:mobile'
     ]);
 
     grunt.registerTask('deploy', [
