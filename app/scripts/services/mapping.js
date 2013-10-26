@@ -1,4 +1,4 @@
-app.service('mapping', function($http, geotracker, geomath) {
+app.service('mapping', function($http, geotracker, geomath, animation) {
     var self = this;
 
     /** markers by name */
@@ -59,7 +59,8 @@ app.service('mapping', function($http, geotracker, geomath) {
             frames.push({ pause: 20 });
             frames = frames.concat(frames.slice(0).reverse());
         }
-        self._startAnimation(frames, "camera", self.map, callback);
+       animation.start({ targetref: self.map, target: "camera", frames: frames },
+            self._onAnimationFrame, callback);
     }
 
     /**
@@ -80,7 +81,8 @@ app.service('mapping', function($http, geotracker, geomath) {
             frames.push(obj);
         }
         frames.reverse();
-        self._startAnimation(frames, "marker", ref, callback);
+        animation.start({ targetref: ref, target: "marker", frames: frames },
+            self._onAnimationFrame, callback);
     }
 
     /**
@@ -125,58 +127,33 @@ app.service('mapping', function($http, geotracker, geomath) {
     }
 
     /**
-     * start animation against a frame list
-     * @param frames
-     * @param targetType
+     * animation frame callback
      * @param target
-     * @param callback
+     * @param targetref
+     * @param frame
      * @private
      */
-    this._startAnimation = function(frames, targetType, target, callback) {
-        var pause = 0;
-        var lastZoom = 0;
-        var animf = function() {
-            if (pause > 0) {
-                pause --;
-                requestAnimationFrame(animf);
-                return;
-            }
-            if (frames.length == 0) {
-                if (callback) {
-                    callback.apply(this);
+    this._onAnimationFrame = function(target, targetref, f) {
+        switch (target) {
+            case "marker":
+                if (f.size) {
+                    targetref.marker.icon.scaledSize = new google.maps.Size(f.size, f.size);
+                    targetref.marker.icon.size = new google.maps.Size(f.size, f.size);
                 }
-                return;
-            }
-            var f = frames.pop();
-            if (f.pause) {
-                pause = f.pause-1;
-                requestAnimationFrame(animf);
-                return;
-            }
+                self.moveMarkerTo(targetref, f.coords);
+                break;
 
-            switch (targetType) {
-                case "marker":
-                    if (f.size) {
-                        target.marker.icon.scaledSize = new google.maps.Size(f.size, f.size);
-                        target.marker.icon.size = new google.maps.Size(f.size, f.size);
-                    }
-                    self.moveMarkerTo(target, f.coords);
-                    break;
+            case "camera":
+                if (f.zoom && f.zoom != self.lastZoom) {
+                    self.lastZoom = f.zoom;
+                    targetref.setZoom(f.zoom);
+                }
 
-                case "camera":
-                    if (f.zoom && f.zoom != lastZoom) {
-                        lastZoom = f.zoom;
-                        target.setZoom(f.zoom);
-                    }
-
-                    if (f.coords) {
-                        target.panTo( new google.maps.LatLng(f.coords.latitude, f.coords.longitude) );
-                    }
-                    break;
-            }
-            requestAnimationFrame(animf);
-        };
-        requestAnimationFrame(animf);
+                if (f.coords) {
+                    targetref.panTo( new google.maps.LatLng(f.coords.latitude, f.coords.longitude) );
+                }
+                break;
+        }
     }
 
     /**
