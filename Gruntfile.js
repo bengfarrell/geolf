@@ -1,17 +1,3 @@
-// Generated on 2013-10-12 using generator-angular 0.4.0
-'use strict';
-var LIVERELOAD_PORT = 35729;
-var lrSnippet = require('connect-livereload')({ port: LIVERELOAD_PORT });
-var mountFolder = function (connect, dir) {
-  return connect.static(require('path').resolve(dir));
-};
-
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// use this if you want to recursively match all subfolders:
-// 'test/spec/**/*.js'
-
 module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
   require('time-grunt')(grunt);
@@ -30,28 +16,9 @@ module.exports = function (grunt) {
   grunt.initConfig({
     yeoman: yeomanConfig,
     watch: {
-      coffee: {
-        files: ['<%= yeoman.app %>/scripts/{,*/}*.coffee'],
-        tasks: ['coffee:dist']
-      },
-      coffeeTest: {
-        files: ['test/spec/{,*/}*.coffee'],
-        tasks: ['coffee:test']
-      },
       styles: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
         tasks: ['copy:styles', 'autoprefixer']
-      },
-      livereload: {
-        options: {
-          livereload: LIVERELOAD_PORT
-        },
-        files: [
-          '<%= yeoman.app %>/{,*/}*.html',
-          '.tmp/styles/{,*/}*.css',
-          '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
-          '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
-        ]
       }
     },
     autoprefixer: {
@@ -63,48 +30,6 @@ module.exports = function (grunt) {
           src: '{,*/}*.css',
           dest: '.tmp/styles/'
         }]
-      }
-    },
-    connect: {
-      options: {
-        port: 9000,
-        // Change this to '0.0.0.0' to access the server from outside.
-        hostname: 'localhost'
-      },
-      livereload: {
-        options: {
-          middleware: function (connect) {
-            return [
-              lrSnippet,
-              mountFolder(connect, '.tmp'),
-              mountFolder(connect, yeomanConfig.app)
-            ];
-          }
-        }
-      },
-      test: {
-        options: {
-          middleware: function (connect) {
-            return [
-              mountFolder(connect, '.tmp'),
-              mountFolder(connect, 'test')
-            ];
-          }
-        }
-      },
-      dist: {
-        options: {
-          middleware: function (connect) {
-            return [
-              mountFolder(connect, yeomanConfig.dist)
-            ];
-          }
-        }
-      }
-    },
-    open: {
-      server: {
-        url: 'http://localhost:<%= connect.options.port %>'
       }
     },
     clean: {
@@ -131,15 +56,6 @@ module.exports = function (grunt) {
             }]
         },
         server: '.tmp'
-    },
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc'
-      },
-      all: [
-        'Gruntfile.js',
-        '<%= yeoman.app %>/scripts/{,*/}*.js'
-      ]
     },
 
     // not used since Uglify task does concat,
@@ -315,29 +231,6 @@ module.exports = function (grunt) {
       }
     }
   });
-
-  grunt.registerTask('server', function (target) {
-    if (target === 'dist') {
-      return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
-    }
-
-    grunt.task.run([
-      'clean:server',
-      'concurrent:server',
-      'autoprefixer',
-      'connect:livereload',
-      'open',
-      'watch'
-    ]);
-    });
-
-    grunt.registerTask('test', [
-    'clean:server',
-    'concurrent:test',
-    'autoprefixer',
-    'connect:test',
-    'karma'
-    ]);
 
     grunt.registerTask('build', [
     'clean:dist',
