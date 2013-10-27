@@ -2,14 +2,14 @@
   Geolf
     <button
           ng-click="initializeGreen()"
-          state="Initializing"
+          state="PreGame"
           class="btn btn-primary">
       Start Game
     </button>
 
     <button
             ng-click="initializeGreen(true)"
-            state="Initializing"
+            state="PreGame"
             class="btn btn-primary">
         Debug Game
     </button>
@@ -17,10 +17,19 @@
 </h1>
 
 <div id="map-canvas" class="map"></div>
+
+<button
+        ng-click="teeoff()"
+        ng-disable="{{ball.inRange || !ball}}"
+        state="GamePlay.BeforeTeeOff"
+        class="btn btn-primary">
+    Tee Off
+</button>
+
 <button
     ng-click="swing()"
     ng-disable="{{ball.inRange || !ball}}"
-    state="GamePlay"
+    state="GamePlay.AfterTeeOff"
     class="btn btn-primary">
     Swing
 </button>

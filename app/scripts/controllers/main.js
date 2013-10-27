@@ -1,6 +1,6 @@
 'use strict';
-app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mapping) {
-    $scope.state = 'Initializing';
+app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mapping, state) {
+    $scope.state = state;
 
     /**
      * constructor
@@ -14,6 +14,7 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
                 mapping.moveMarkerTo($scope.golfer, geotracker.geo.coords);
             }
         });
+        state.setState($scope, "PreGame");
     }
 
     /**
@@ -26,7 +27,7 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
         } else {
             self.debug = false;
         }
-        $scope.state = 'Initializing';
+        state.setState($scope, 'Initializing');
         mapping.create();
         $scope.golfer = mapping.addMarker('me', 'me');
         places.search(500, $scope.onPlaces);
@@ -36,28 +37,35 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
      * send camera to find ball
      */
     $scope.findBall = function() {
-        $scope.state = 'Animating';
+        state.setState($scope, 'Animating');
         mapping.animateCameraTo($scope.ball.coords, {animation: 'arc', returnToOriginal: true}, function() {
-            $scope.state = 'GamePlay';
+            state.undoState();
         });
     }
 
     /**
-     * swing golf club
+     * tee off
      */
-    $scope.swing = function() {
-        $scope.state = 'Animating';
-
+    $scope.teeoff = function() {
         if (!$scope.ball) {
             $scope.ball = mapping.addMarker('ball', 'ball');
             $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
             $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
             $scope.ball.inRange = ($scope.ball.distanceTo < 10 || self.debug);
         }
+        state.setState($scope, 'GamePlay.AfterTeeOff');
+        $scope.swing();
+    }
+
+    /**
+     * swing golf club
+     */
+    $scope.swing = function() {
+        state.setState($scope, 'Animating');
         mapping.animateMarkerBy(
             $scope.ball, $scope.power,
             $scope.direction, {animation: 'arc'}, function() {
-                $scope.state = 'GamePlay';
+                state.undoState();
                 $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
                 $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
                 $scope.ball.inRange = ($scope.ball.distanceTo < 10) || self.debug;
@@ -69,7 +77,7 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
      * on place retrieval
      */
     $scope.onPlaces = function() {
-        $scope.state = 'GamePlay';
+        state.setState($scope, 'GamePlay.BeforeTeeOff');
         var hole = places.getFarthest();
         mapping.addMarker('loc', hole.name, hole.location);
         $scope.$apply();
