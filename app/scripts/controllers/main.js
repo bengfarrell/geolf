@@ -18,15 +18,17 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
 
     /**
      * initialize golf green around user's location
+     * @param use debug mode
      */
-    $scope.initializeGreen = function() {
+    $scope.initializeGreen = function(debugMode) {
+        if (debugMode) {
+            self.debug = true;
+        } else {
+            self.debug = false;
+        }
         $scope.state = 'Initializing';
         mapping.create();
         $scope.golfer = mapping.addMarker('me', 'me');
-        $scope.ball = mapping.addMarker('ball', 'ball');
-        $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
-        $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
-        $scope.ball.inRange = ($scope.ball.distanceTo < 10);
         places.search(500, $scope.onPlaces);
     }
 
@@ -45,13 +47,20 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
      */
     $scope.swing = function() {
         $scope.state = 'Animating';
+
+        if (!$scope.ball) {
+            $scope.ball = mapping.addMarker('ball', 'ball');
+            $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
+            $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
+            $scope.ball.inRange = ($scope.ball.distanceTo < 10 || self.debug);
+        }
         mapping.animateMarkerBy(
             $scope.ball, $scope.power,
             $scope.direction, {animation: 'arc'}, function() {
                 $scope.state = 'GamePlay';
                 $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
                 $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
-                $scope.ball.inRange = ($scope.ball.distanceTo < 10);
+                $scope.ball.inRange = ($scope.ball.distanceTo < 10) || self.debug;
                 $scope.$apply();
             });
     }

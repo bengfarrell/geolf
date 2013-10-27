@@ -8,7 +8,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
     this.config = {
         google: {
             zoom: 16,
-            mapTypeId: google.maps.MapTypeId.SATELLITE,
+            mapTypeId: google.maps.MapTypeId.TERRAIN,
             disableDefaultUI: true
         },
         animationSteps: 100,
