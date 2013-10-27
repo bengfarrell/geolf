@@ -3,7 +3,7 @@ app.service('animation', function() {
 
     /** should we try to use request animation frame? -
      *  unavailable on mobile webviews and some browsers*/
-    this.useRequestAnimationFrame = false;
+    this.useRequestAnimationFrame = true;
 
     /** tick interval in milliseconds if using setInterval for animation timing */
     this.tickInterval = 25;
@@ -21,7 +21,7 @@ app.service('animation', function() {
         self.pause = 0;
         self.framecb = framecallback;
         self.animcb = animationcallback;
-        if (requestAnimationFrame && self.useRequestAnimationFrame) {
+        if (window.requestAnimationFrame && self.useRequestAnimationFrame) {
             self._drawFrame();
         } else {
             self.useRequestAnimationFrame = false;

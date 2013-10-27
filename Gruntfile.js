@@ -358,6 +358,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('mobile', [
+        'build',
         'clean:mobile',
         'copy:mobile'
     ]);
