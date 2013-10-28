@@ -18,10 +18,13 @@ app.service('places', function($http, geotracker, geomath, mapping) {
      * @param geo
      * @param callback
      */
-    this.search = function(radius, callback) {
+    this.search = function(radius, callback, geo) {
         self.callback = callback;
         if (self.config.providerName == "GooglePlaces") {
-            var llb = new google.maps.LatLng(geotracker.geo.coords.latitude, geotracker.geo.coords.longitude);
+            if (!geo) {
+                geo = geotracker.geo;
+            }
+            var llb = new google.maps.LatLng(geo.coords.latitude, geo.coords.longitude);
             var service = new google.maps.places.PlacesService(mapping.map);
             service.nearbySearch({radius: radius, location: llb}, self._onPlacesFound);
         }

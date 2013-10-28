@@ -9,6 +9,12 @@ body {
     height: 300px;
 }
 
+.tinymap {
+    width: 48%;
+    height: 350px;
+    display: inline-block;
+}
+
 .arrow {
     display: inline-block;
     width: 0;
@@ -16,6 +22,11 @@ body {
     border-top: 7px solid transparent;
     border-bottom: 7px solid transparent;
     border-right: 30px solid blue;
+}
+
+.holesContainer {
+    width: 48%;
+    display: inline-block;
 }
 
 .container {

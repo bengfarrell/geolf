@@ -10,6 +10,14 @@ app.service('geotracker', function() {
     this.listeners = [];
 
     /**
+     * get one time geolocation
+     * @param callback
+     */
+    this.getCurrent = function(callback) {
+        navigator.geolocation.getCurrentPosition(callback, self.error, self.config);
+    }
+
+    /**
      * start tracking
      * @param callback for geoservice update
      * @param optional config to override default

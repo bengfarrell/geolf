@@ -1,17 +1,17 @@
 'use strict';
-app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mapping, state) {
-    $scope.state = state;
-
+app.controller('GameController', function ($scope, $location, geotracker, geomath, mapping, state) {
     /**
      * constructor
      */
     $scope.init = function() {
+        $scope.state = state;
         geotracker.start();
         geotracker.subscribe(function() {
             if ($scope.ball) {
                 $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
                 $scope.ball.inRange = ($scope.ball.distanceTo < 10);
                 mapping.moveMarkerTo($scope.golfer, geotracker.geo.coords);
+                $scope.$apply();
             }
         });
         state.setState($scope, "PreGame");
@@ -19,18 +19,16 @@ app.controller('MainCtrl', function ($scope, geotracker, geomath, places, mappin
 
     /**
      * initialize golf green around user's location
-     * @param use debug mode
      */
-    $scope.initializeGreen = function(debugMode) {
-        if (debugMode) {
-            self.debug = true;
-        } else {
-            self.debug = false;
-        }
+    $scope.initializeGreen = function() {
         state.setState($scope, 'Initializing');
-        mapping.create();
+        mapping.create("map-canvas");
         $scope.golfer = mapping.addMarker('me', 'me');
-        places.search(500, $scope.onPlaces);
+
+        state.setState($scope, 'GamePlay.BeforeTeeOff');
+        $scope.currentHole = $scope.holes[0];
+        mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
+       // places.search(500, $scope.onPlaces);
     }
 
     /**

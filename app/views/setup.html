@@ -1,0 +1,23 @@
+<div class="hero-unit">
+    <h1>Geolf
+        <button
+                ng-click="startGame()"
+                state="Loaded"
+                class="btn btn-primary">
+            Start game
+        </button>
+
+        <button
+                ng-click="startGame(true)"
+                state="Loaded"
+                class="btn btn-primary">
+            Debug Game
+        </button>
+    </h1>
+
+    <div id="map-canvas" class="tinymap"></div>
+    <ul class="holesContainer">
+        <li class="hole" ng-repeat="hole in holes">Hole #{{hole.num}} - {{hole.name}}</li>
+    </ul>
+
+</div>

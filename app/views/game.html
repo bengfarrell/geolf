@@ -1,19 +1,11 @@
 <h1>
-  Geolf
+  Hole #{{currentHole.num}} {{currentHole.name}}
     <button
           ng-click="initializeGreen()"
           state="PreGame"
           class="btn btn-primary">
-      Start Game
+      Begin
     </button>
-
-    <button
-            ng-click="initializeGreen(true)"
-            state="PreGame"
-            class="btn btn-primary">
-        Debug Game
-    </button>
-
 </h1>
 
 <div id="map-canvas" class="map"></div>

@@ -108,17 +108,19 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
 
     /**
      * create the map
+     * @param map ID (in DOM)
      * @param center
      * @returns {Function|map|*|exports.minify.map|optionTypes.map|SourceNode.toStringWithSourceMap.map}
      */
-    this.create = function(center) {
+    this.create = function(mID, center) {
+        var ll;
         if (center) {
-            self.config.google.center = center;
+            ll = new google.maps.LatLng(center.coords.latitude, center.coords.longitude)
         } else {
-            var ll = new google.maps.LatLng(geotracker.geo.coords.latitude, geotracker.geo.coords.longitude)
-            self.config.google.center = ll;
+            ll = new google.maps.LatLng(geotracker.geo.coords.latitude, geotracker.geo.coords.longitude)
         }
-        self.map = new google.maps.Map(document.getElementById('map-canvas'), self.config.google);
+        self.config.google.center = ll;
+        self.map = new google.maps.Map(document.getElementById(mID), self.config.google);
 
         geotracker.subscribe(function(geo) {
             self.map.setCenter(new google.maps.LatLng(geo.coords.latitude, geo.coords.longitude));
