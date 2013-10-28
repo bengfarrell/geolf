@@ -7,6 +7,9 @@ app.controller('GameController', function ($scope, $location, geotracker, geomat
         $scope.state = state;
         geotracker.start();
         geotracker.subscribe(function() {
+            if (!$scope.initialized) {
+                $scope.initializeGreen();
+            }
             if ($scope.ball) {
                 $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
                 $scope.ball.inRange = ($scope.ball.distanceTo < 10);
@@ -14,20 +17,20 @@ app.controller('GameController', function ($scope, $location, geotracker, geomat
                 $scope.$apply();
             }
         });
-        state.setState($scope, "PreGame");
     }
 
     /**
      * initialize golf green around user's location
      */
     $scope.initializeGreen = function() {
-        state.setState($scope, 'Initializing');
+        $scope.initialized = true;
         mapping.create("map-canvas");
         $scope.golfer = mapping.addMarker('me', 'me');
 
         state.setState($scope, 'GamePlay.BeforeTeeOff');
         $scope.currentHole = $scope.holes[0];
         mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
+        $scope.$apply();
        // places.search(500, $scope.onPlaces);
     }
 
