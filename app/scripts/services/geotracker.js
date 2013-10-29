@@ -31,7 +31,7 @@ app.service('geotracker', function() {
     };
 
     /**
-     * subscribe  to geo service
+     * subscribe to geo service
      * @param callback
      */
     this.subscribe = function(callback) {

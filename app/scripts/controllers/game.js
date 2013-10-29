@@ -1,11 +1,21 @@
 'use strict';
-app.controller('GameController', function ($scope, $location, geotracker, geomath, mapping, state) {
+app.controller('GameController', function ($scope, $location, orientation, geotracker, geomath, mapping, state) {
     /**
      * constructor
      */
     $scope.init = function() {
         $scope.state = state;
         geotracker.start();
+
+        if (orientation.available) {
+            orientation.start();
+            orientation.subscribe(function(heading) {
+                $scope.direction = heading.magneticHeading;
+                $scope.$apply();
+            });
+        }
+        $scope.useHardwareOrientation = orientation.available;
+
         geotracker.subscribe(function() {
             if (!$scope.initialized) {
                 $scope.initializeGreen();

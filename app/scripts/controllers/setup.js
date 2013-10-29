@@ -1,5 +1,5 @@
 'use strict';
-app.controller('SetupController', function ($scope, $location, geotracker, places, mapping, state) {
+app.controller('SetupController', function ($scope, $location, geotracker, places, mapping, state, orientation) {
     /**
      * constructor
      */

@@ -33,7 +33,7 @@
     Find Ball
 </button>
 
-<label>
+<label ng-hide="useHardwareOrientation">
     Angle <span>{{direction}}</span>
     <input type="range" ng-model="direction" name="angle" min="0" max="360" ng-init="direction=0">
 </label>
