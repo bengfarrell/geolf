@@ -1,7 +1,20 @@
 body {
-    background: #fafafa;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #edeae3;
     color: #333;
+    font-family: pt-sans, sans-serif;
+}
+
+h1 {
+    font-family: paytone-one, sans-serif;
+}
+
+.btn {
+    background-color: #333;
+    border-color: #222;
+}
+
+h1 .btn {
+    font-family: pt-sans, sans-serif;
 }
 
 .map {
@@ -10,9 +23,7 @@ body {
 }
 
 .tinymap {
-    width: 48%;
-    height: 350px;
-    display: inline-block;
+    height: 250px;
 }
 
 .arrow {
@@ -21,12 +32,28 @@ body {
     height: 0;
     border-top: 7px solid transparent;
     border-bottom: 7px solid transparent;
-    border-right: 30px solid blue;
+    border-right: 30px solid #333;
+    border-radius: 15px;
 }
 
 .holesContainer {
-    width: 48%;
-    display: inline-block;
+    padding-left: 0px;
+}
+
+li.hole {
+    list-style: none;
+    margin: 5px;
+    width: 100%;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 5px;
+    padding: 5px;
+    color: #f3f3bc;
+    background-color: #7e8769;
+}
+
+h3 .holeDistance {
+    font-weight: bold;
 }
 
 .container {

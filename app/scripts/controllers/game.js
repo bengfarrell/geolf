@@ -5,16 +5,20 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
      */
     $scope.init = function() {
         $scope.state = state;
+        $scope.orientation = orientation;
         geotracker.start();
+
+        $scope.$watch('orientation.heading.magneticHeading', function(oldVal, newVal, scope) {
+            if (scope.player) {
+                var ico = scope.player.marker.getIcon();
+                ico.rotation = newVal;
+                scope.player.marker.setIcon(ico);
+            }
+        });
 
         if (orientation.available) {
             orientation.start();
-            orientation.subscribe(function(heading) {
-                $scope.direction = heading.magneticHeading;
-                $scope.$apply();
-            });
         }
-        $scope.useHardwareOrientation = orientation.available;
 
         geotracker.subscribe(function() {
             if (!$scope.initialized) {
@@ -23,9 +27,14 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
             if ($scope.ball) {
                 $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
                 $scope.ball.inRange = ($scope.ball.distanceTo < 10);
-                mapping.moveMarkerTo($scope.golfer, geotracker.geo.coords);
-                $scope.$apply();
+                mapping.moveMarkerTo($scope.player, geotracker.geo.coords);
             }
+
+            if ($scope.currentHole) {
+                $scope.currentHole.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.currentHole.location) -90;
+                $scope.currentHole.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.currentHole.location);
+            }
+            $scope.$apply();
         });
     }
 
@@ -35,22 +44,33 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
     $scope.initializeGreen = function() {
         $scope.initialized = true;
         mapping.create("map-canvas");
-        $scope.golfer = mapping.addMarker('me', 'me');
+        $scope.player = mapping.addMarker('player', 'player');
 
         state.setState($scope, 'GamePlay.BeforeTeeOff');
         $scope.currentHole = $scope.holes[0];
         mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
         $scope.$apply();
-       // places.search(500, $scope.onPlaces);
     }
 
     /**
      * send camera to find ball
      */
-    $scope.findBall = function() {
+    $scope.locateBall = function() {
         state.setState($scope, 'Animating');
         mapping.animateCameraTo($scope.ball.coords, {animation: 'arc', returnToOriginal: true}, function() {
             state.undoState();
+            $scope.$apply();
+        });
+    }
+
+    /**
+     * send camera to find hole
+     */
+    $scope.locateHole = function() {
+        state.setState($scope, 'Animating');
+        mapping.animateCameraTo($scope.currentHole.location, {animation: 'arc', returnToOriginal: true}, function() {
+            state.undoState();
+            $scope.$apply();
         });
     }
 
@@ -75,7 +95,7 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
         state.setState($scope, 'Animating');
         mapping.animateMarkerBy(
             $scope.ball, $scope.power,
-            $scope.direction, {animation: 'arc'}, function() {
+            orientation.heading.magneticHeading -270, {animation: 'arc'}, function() {
                 state.undoState();
                 $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
                 $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;

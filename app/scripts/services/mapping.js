@@ -26,9 +26,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
         if (!coords) {
             coords = geotracker.geo.coords;
         }
-        self.markers[name] = self._markerFactory(type);
-        var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
-        self.markers[name].setPosition(latlng);
+        self.markers[name] = self._markerFactory(type, coords);
         return { marker: self.markers[name], coords: coords};
     }
 
@@ -163,23 +161,32 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
      * @param type
      * @private
      */
-    this._markerFactory = function(type) {
+    this._markerFactory = function(type, coords) {
+        var latlng;
+        if (coords) {
+            latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
+        }
         switch (type) {
-            case "me":
+            case "player":
                 return new google.maps.Marker({
                     map: self.map,
-                    icon: new google.maps.MarkerImage(
-                        'images/golfer.png',
-                        new google.maps.Size(40, 60),
-                        new google.maps.Point(0, 0),
-                        new google.maps.Point(Math.floor(40/2), Math.floor(60/2)),
-                        new google.maps.Size(40, 60)
-                    )
+                    position: latlng,
+                    flat: true,
+                    icon: {
+                        anchor: new google.maps.Point(168, 900),
+                        path: "M 337.14285,951.79076 C 336.85134,1085.9601 1.8926143,1088.4865 -5.7142858e-6,951.79076 -5.7142858e-6,827.13221 169.31441,188.15081 168.57142,198.07649 c 0,0 168.57143,629.05572 168.57143,753.71427 z",
+                        fillColor: '#333',
+                        fillOpacity: 1,
+                        strokeColor: '',
+                        strokeWeight: 0,
+                        scale:.035
+                    }
                 });
 
             case "ball":
                 return new google.maps.Marker({
                     map: self.map,
+                    position: latlng,
                     icon: new google.maps.MarkerImage(
                         'images/golf-ball.png',
                         new google.maps.Size(15, 15),
@@ -191,6 +198,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
 
             default:
                 return new google.maps.Marker({
+                    position: latlng,
                     map: self.map
                 });
 

@@ -11,6 +11,9 @@ app.service('orientation', function() {
     /** orientation listeners */
     this.listeners = [];
 
+    /** heading */
+    this.heading = { magneticHeading: 0 };
+
     /**
      * get one time orientation
      * @param callback

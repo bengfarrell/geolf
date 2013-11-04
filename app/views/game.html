@@ -1,12 +1,25 @@
 <h1>
   Hole #{{currentHole.num}} {{currentHole.name}}
-    <button
-          ng-click="initializeGreen()"
-          state="PreGame"
-          class="btn btn-primary">
-      Begin
-    </button>
 </h1>
+
+<h3>
+    <compass class="arrow ball" direction="{{currentHole.bearingTo}}"></compass>
+    <span class="holeDistance">{{currentHole.distanceTo}}</span> meters to hole
+    <div class="pull-right">
+        <button
+                ng-click="locateBall()"
+                state="GamePlay.AfterTeeOff"
+                class="btn btn-primary">
+            o
+        </button>
+        <button
+                ng-click="locateHole()"
+                state="GamePlay"
+                class="btn btn-primary">
+            F
+        </button>
+    </div>
+</h3>
 
 <div id="map-canvas" class="map"></div>
 
@@ -26,16 +39,9 @@
     Swing
 </button>
 
-<button
-    ng-click="findBall()"
-    state="GamePlay"
-    class="btn btn-primary">
-    Find Ball
-</button>
-
-<label ng-hide="useHardwareOrientation">
-    Angle <span>{{direction}}</span>
-    <input type="range" ng-model="direction" name="angle" min="0" max="360" ng-init="direction=0">
+<label ng-hide="orientation.available">
+    Angle
+    <input type="range" ng-model="orientation.heading.magneticHeading" name="angle" min="0" max="360">
 </label>
 
 <label>
@@ -43,6 +49,4 @@
     <input type="range" ng-model="power" name="power" min="0" max="500" ng-init="power=0">
 </label>
 
-<compass class="arrow" direction="{{direction}}"></compass>
-<compass class="arrow ball" direction="{{ball.bearingTo}}"></compass>
 <span>{{ball.distanceTo}} meters away</span>
