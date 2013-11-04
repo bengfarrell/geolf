@@ -18,9 +18,9 @@ app.controller('SetupController', function ($scope, $location, geotracker, place
      */
     $scope.startGame = function(debugMode) {
         if (debugMode) {
-            $scope.debug = true;
+            $scope.$parent.debug = true;
         } else {
-            $scope.debug = false;
+            $scope.$parent.debug = false;
         }
         $location.url('/game');
     }

@@ -24,16 +24,10 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
             if (!$scope.initialized) {
                 $scope.initializeGreen();
             }
-            if ($scope.ball) {
-                $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
-                $scope.ball.inRange = ($scope.ball.distanceTo < 10);
-                mapping.moveMarkerTo($scope.player, geotracker.geo.coords);
-            }
+            $scope.updateBall();
+            $scope.updateHole();
 
-            if ($scope.currentHole) {
-                $scope.currentHole.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.currentHole.location) -90;
-                $scope.currentHole.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.currentHole.location);
-            }
+            mapping.moveMarkerTo($scope.player, geotracker.geo.coords);
             $scope.$apply();
         });
     }
@@ -47,8 +41,11 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
         $scope.player = mapping.addMarker('player', 'player');
 
         state.setState($scope, 'GamePlay.BeforeTeeOff');
-        $scope.currentHole = $scope.holes[0];
-        mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
+
+        // reverse to pop
+        $scope.holes.reverse();
+        $scope.currentHole = $scope.holes.pop();
+        $scope.currentHoleMarker = mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
         $scope.$apply();
     }
 
@@ -80,9 +77,7 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
     $scope.teeoff = function() {
         if (!$scope.ball) {
             $scope.ball = mapping.addMarker('ball', 'ball');
-            $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
-            $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
-            $scope.ball.inRange = ($scope.ball.distanceTo < 10 || self.debug);
+            $scope.updateBall();
         }
         state.setState($scope, 'GamePlay.AfterTeeOff');
         $scope.swing();
@@ -97,9 +92,7 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
             $scope.ball, $scope.power,
             orientation.heading.magneticHeading -270, {animation: 'arc'}, function() {
                 state.undoState();
-                $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
-                $scope.ball.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.ball.coords) -90;
-                $scope.ball.inRange = ($scope.ball.distanceTo < 10) || self.debug;
+                $scope.updateBall();
                 $scope.$apply();
             });
     }
@@ -112,6 +105,34 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
         var hole = places.getFarthest();
         mapping.addMarker('loc', hole.name, hole.location);
         $scope.$apply();
+    }
+
+    /**
+     * update ball with new coords
+     */
+    $scope.updateBall = function() {
+        if ($scope.ball) {
+            $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
+            $scope.ball.distanceToHole = geomath.calculateDistance($scope.currentHole.location, $scope.ball.coords);
+            $scope.ball.inRange = ($scope.ball.distanceTo < 10) || $scope.debug;
+
+            if ($scope.ball.distanceToHole < 50) {
+                $scope.currentHole = $scope.holes.pop();
+                mapping.moveMarkerTo($scope.currentHoleMarker, $scope.currentHole.location);
+                $scope.updateBall();
+                $scope.updateHole();
+            }
+        }
+    }
+
+    /**
+     * update hole with new coords
+     */
+    $scope.updateHole = function() {
+        if ($scope.currentHole) {
+            $scope.currentHole.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.currentHole.location) -90;
+            $scope.currentHole.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.currentHole.location);
+        }
     }
 
     /** call c-tor */
