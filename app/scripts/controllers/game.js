@@ -8,13 +8,13 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
         $scope.orientation = orientation;
         geotracker.start();
 
-        $scope.$watch('orientation.heading.magneticHeading', function(oldVal, newVal, scope) {
-            if (scope.player) {
-                var ico = scope.player.marker.getIcon();
-                ico.rotation = newVal;
-                scope.player.marker.setIcon(ico);
+        orientation.subscribe(function(heading) {
+            if ($scope.player) {
+                var ico = $scope.player.marker.getIcon();
+                ico.rotation = heading.magneticHeading;
+                $scope.player.marker.setIcon(ico);
             }
-        });
+        })
 
         if (orientation.available) {
             orientation.start();
@@ -44,6 +44,7 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
 
         // reverse to pop
         $scope.holes.reverse();
+
         $scope.currentHole = $scope.holes.pop();
         $scope.currentHoleMarker = mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
         $scope.$apply();

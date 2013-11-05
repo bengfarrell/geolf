@@ -67,6 +67,13 @@ app.service('orientation', function() {
     }
 
     /**
+     * manual refresh for outside mechanisms updating the heading object
+     */
+    this.forceRefresh = function() {
+        this.updated(self.heading);
+    }
+
+    /**
      * update orientation error handler
      * @param error
      */
