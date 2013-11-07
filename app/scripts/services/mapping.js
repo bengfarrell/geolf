@@ -46,13 +46,14 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
             obj.coords = geomath.projectOut(self.map.getCenter(), distance_step * c, bearing+180);
             frames.push(obj);
         }
-        for (var c = 0; c < self.config.cameraAnimationSteps; c++) {
+        /* ditch the zooming for now - on the type of map I'm using it doesn't go further
+            for (var c = 0; c < self.config.cameraAnimationSteps; c++) {
             var obj = {};
             if (config.animation = "arc") {
                 obj.zoom = parseInt(self.map.getZoom() + (self.config.closeUpZoom - self.map.getZoom()) * Math.sin(c / self.config.cameraAnimationSteps * Math.PI/2));
             }
             frames.push(obj);
-        }
+        }*/
         if (config.returnToOriginal == true) {
             frames.push({ pause: 20 });
             frames = frames.concat(frames.slice(0).reverse());
