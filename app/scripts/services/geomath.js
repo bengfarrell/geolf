@@ -65,9 +65,10 @@ app.service('geomath', function() {
      */
     this.convertFromGoogle = function(llobjs) {
        llobjs.forEach( function(llo) {
-           if (llo.lb && llo.mb) {
-               llo.latitude = llo.lb;
-               llo.longitude = llo.mb;
+           console.log(llo)
+           if (llo.nb && llo.ob) {
+               llo.latitude = llo.nb;
+               llo.longitude = llo.ob;
            }
        });
     }
