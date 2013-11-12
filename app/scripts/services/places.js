@@ -78,7 +78,7 @@ app.service('places', function($http, geotracker, geomath, mapping) {
         if (self.config.providerName == "GooglePlaces") {
             results.forEach( function(i) {
                 var dest = {
-                    location: { latitude: i.geometry.location.nb, longitude: i.geometry.location.ob },
+                    location: { latitude: i.geometry.location.lat(), longitude: i.geometry.location.lng() },
                     name: i.name
                 }
                 self.places.push(dest);

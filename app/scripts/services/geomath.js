@@ -65,11 +65,11 @@ app.service('geomath', function() {
      */
     this.convertFromGoogle = function(llobjs) {
        llobjs.forEach( function(llo) {
-           console.log(llo)
-           if (llo.nb && llo.ob) {
-               llo.latitude = llo.nb;
-               llo.longitude = llo.ob;
+           if (typeof(llo.lat) != "undefined" && typeof(llo.lng) != "undefined") {
+               llo.latitude = llo.lat();
+               llo.longitude = llo.lng();
            }
+           console.log(llo)
        });
     }
 
