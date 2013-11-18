@@ -150,6 +150,7 @@ module.exports = function (grunt) {
               dest: '<%= yeoman.dist %>',
               src: [
                 'libs/angular/angular.min.js',
+                'libs/angular-route/angular-route.min.js',
               ]
             },
             {

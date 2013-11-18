@@ -1,5 +1,5 @@
 'use strict';
-var app = angular.module('geolfApp', []);
+var app = angular.module('geolfApp', ['ngRoute']);
 
 app.config(function ($routeProvider) {
     $routeProvider

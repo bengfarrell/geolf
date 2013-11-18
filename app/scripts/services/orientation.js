@@ -2,7 +2,7 @@ app.service('orientation', function() {
     var self = this;
 
     this.config = {
-        frequency: 300
+        frequency: 100
     };
 
     /** is orientation available ? */
@@ -13,6 +13,20 @@ app.service('orientation', function() {
 
     /** heading */
     this.heading = { magneticHeading: 0 };
+
+    /**
+     * c-tor
+     */
+    this.init = function() {
+        document.addEventListener("deviceready", self.onDeviceReady, false)
+    }
+
+    /**
+     * phonegap device ready listener
+     */
+    this.onDeviceReady = function() {
+        self.available = navigator.compass ? true : false;
+    }
 
     /**
      * get one time orientation
@@ -80,4 +94,6 @@ app.service('orientation', function() {
     this.error = function(error) {
         console.log("error");
     }
+
+    this.init();
 });

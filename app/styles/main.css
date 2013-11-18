@@ -28,12 +28,13 @@ h1 .btn {
 
 .arrow {
     display: inline-block;
-    width: 0;
-    height: 0;
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
-    border-right: 30px solid #333;
-    border-radius: 15px;
+    background-image: url("../images/compass.svg");
+    background-size: 100%;
+    -webkit-transform-origin: 50% 80%;
+    width: 12px;
+    height: 34px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .holesContainer {

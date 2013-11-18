@@ -131,7 +131,7 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
      */
     $scope.updateHole = function() {
         if ($scope.currentHole) {
-            $scope.currentHole.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.currentHole.location) -90;
+            $scope.currentHole.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.currentHole.location) -180;
             $scope.currentHole.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.currentHole.location);
         }
     }

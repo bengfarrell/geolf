@@ -69,7 +69,6 @@ app.service('geomath', function() {
                llo.latitude = llo.lat();
                llo.longitude = llo.lng();
            }
-           console.log(llo)
        });
     }
 
