@@ -31,6 +31,19 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
     }
 
     /**
+     * remove marker
+     * @param ref
+     */
+    this.removeMarker = function(ref) {
+        for (var c in self.markers) {
+            if (self.markers[c] == ref) {
+                self.markers.splice(c, 1);
+            }
+        }
+        ref.marker.setMap(null);
+    }
+
+    /**
      * animate camera to geoposition
      * @param coords
      * @param config
@@ -54,10 +67,12 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
             }
             frames.push(obj);
         }*/
-        if (config.returnToOriginal == true) {
+        if (config && config.returnToOriginal == true) {
             frames.push({ pause: 20 });
             frames = frames.concat(frames.slice(0).reverse());
         }
+
+       frames.reverse();
        animation.start({ targetref: self.map, target: "camera", frames: frames },
             self._onAnimationFrame, callback);
     }
@@ -194,6 +209,19 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
                         new google.maps.Point(0, 0),
                         new google.maps.Point(Math.floor(15/2), Math.floor(15/2)),
                         new google.maps.Size(15, 15)
+                    )
+                });
+
+            case "dot":
+                return new google.maps.Marker({
+                    map: self.map,
+                    position: latlng,
+                    icon: new google.maps.MarkerImage(
+                        'images/reddot.png',
+                        new google.maps.Size(8, 8),
+                        new google.maps.Point(0, 0),
+                        new google.maps.Point(Math.floor(8/2), Math.floor(8/2)),
+                        new google.maps.Size(8, 8)
                     )
                 });
 
