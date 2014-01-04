@@ -151,7 +151,7 @@ module.exports = function (grunt) {
               src: [
                 'libs/angular/angular.min.js',
                 'libs/angular-route/angular-route.min.js',
-                'libs/angular-ui/bootstrap/dist/js/bootstrap.min.js'
+                'libs/angular-ui-bootstrap/dist/ui-bootstrap-0.7.0.min.js'
               ]
             },
             {

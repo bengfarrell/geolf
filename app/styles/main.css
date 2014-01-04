@@ -13,6 +13,20 @@ h1 {
     border-color: #222;
 }
 
+.btn.btn-swing {
+    height:200px;
+    width: 50%;
+}
+
+.btn.btn-swing:active {
+   background-size: #aaa;
+}
+
+.driving-stats {
+    width: 50%;
+    padding: 15px;
+}
+
 h1 .btn {
     font-family: pt-sans, sans-serif;
 }
