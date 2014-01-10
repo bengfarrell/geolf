@@ -1,14 +1,14 @@
 'use strict';
-app.controller('GameController', function ($scope, $location, orientation, geotracker, geomath, mapping, state) {
+app.controller('GameController', function ($scope, $location, compass, geotracker, geomath, mapping, state) {
     /**
      * constructor
      */
     $scope.init = function() {
         $scope.state = state;
-        $scope.orientation = orientation;
+        $scope.compass = compass;
         geotracker.start();
 
-        orientation.subscribe(function(heading) {
+        compass.subscribe(function(heading) {
             if ($scope.player) {
                 var ico = $scope.player.marker.getIcon();
                 ico.rotation = heading.magneticHeading;
@@ -16,8 +16,8 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
             }
         })
 
-        if (orientation.available) {
-            orientation.start();
+        if (compass.available) {
+            compass.start();
         }
 
         geotracker.subscribe(function() {
@@ -91,7 +91,7 @@ app.controller('GameController', function ($scope, $location, orientation, geotr
         state.setState($scope, 'Animating');
         mapping.animateMarkerBy(
             $scope.ball, $scope.power,
-            orientation.heading.magneticHeading -270, {animation: 'arc'}, function() {
+            compass.heading.magneticHeading -270, {animation: 'arc'}, function() {
                 state.undoState();
                 $scope.updateBall();
                 $scope.$apply();

@@ -1,12 +1,12 @@
-app.service('orientation', function() {
+app.service('acceleration', function() {
     var self = this;
 
     this.config = {
         frequency: 100
     };
 
-    /** is device orientation available ? */
-    this.available = window.DeviceOrientationEvent ? true : false;
+    /** is accelerometer available ? */
+    this.available = navigator.accelerometer ? true : false;
 
     /** orientation listeners */
     this.listeners = [];
@@ -25,7 +25,7 @@ app.service('orientation', function() {
      * phonegap device ready listener
      */
     this.onDeviceReady = function() {
-        self.available = window.DeviceOrientationEvent ? true : false;
+        self.available = navigator.accelerometer ? true : false;
     }
 
     /**
@@ -34,6 +34,7 @@ app.service('orientation', function() {
      */
     this.getCurrent = function(callback) {
         if (!self.available) { return false; }
+        navigator.accelerometer.getCurrentAcceleration(callback, self.error);
     }
 
     /**
@@ -44,8 +45,11 @@ app.service('orientation', function() {
      */
     this.start = function(config) {
         if (!self.available) { return false; }
-        self.config = config;
-        window.addEventListener('deviceorientation', self.updated);
+        if (config) { self.config = config; }
+        self.accelerationWatch = navigator.accelerometer.watchAcceleration(
+            self.updated, function(ex) {
+                console.log("accel fail (" + ex.name + ": " + ex.message + ")");
+            }, {frequency: 500});
     };
 
     /**
@@ -53,7 +57,8 @@ app.service('orientation', function() {
      */
     this.stop = function() {
         if (!self.available) { return false; }
-        window.removeEventListener('deviceorientation', self.updated);
+        navigator.accelerometer.clearWatch(self.accelerationWatch);
+        self.accelerationWatch = null;
     }
 
     /**
@@ -65,14 +70,29 @@ app.service('orientation', function() {
     }
 
     /**
-     * update orientation
-     * @param orientation
+     * update acceleration
+     * @param acceleration
      */
-    this.updated = function(o) {
-        self.orientation = o;
+    this.updated = function(a) {
+        self.acceleration = a;
         self.listeners.forEach( function(l) {
-            l.apply(this, [o]);
+            l.apply(this, [a]);
         });
+    }
+
+    /**
+     * manual refresh for outside mechanisms updating the heading object
+     */
+    this.forceRefresh = function() {
+        this.updated(self.heading);
+    }
+
+    /**
+     * update orientation error handler
+     * @param error
+     */
+    this.error = function(error) {
+        console.log("error");
     }
 
     this.init();

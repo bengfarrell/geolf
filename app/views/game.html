@@ -40,9 +40,9 @@
     Swing
 </button>
 
-<label ng-hide="orientation.available">
+<label ng-hide="compass.available">
     Angle
-    <input type="range" ng-change="orientation.forceRefresh()" ng-model="orientation.heading.magneticHeading" name="angle" min="0" max="360">
+    <input type="range" ng-change="compass.forceRefresh()" ng-model="compass.heading.magneticHeading" name="angle" min="0" max="360">
 </label>
 
 <label>

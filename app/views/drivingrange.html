@@ -1,14 +1,6 @@
-<h3>Driving Range</h3>
+<h3 ng-click="hit(400)">Driving Range</h3>
 
-<button class="btn btn-primary btn-geolf btn-swing pull-left"
-        ng-mousedown="onStartSwing($event)"
-        ng-mousemove="onSwinging($event)"
-        ng-mouseout="onStopSwing($event)"
-        ng-mouseup="onStopSwing($event)">
-    Start
-</button>
-
-<div class="pull-right driving-stats">
+<div class="driving-stats">
     <h4>Wobble: {{trackSwing.wobble.average.toFixed(2)}}</h4>
     <h4>Distance: {{trackSwing.distance}}m</h4>
 </div>

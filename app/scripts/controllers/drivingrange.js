@@ -1,11 +1,11 @@
 'use strict';
-app.controller('DrivingRangeController', function ($scope, mapping, geotracker, orientation) {
+app.controller('DrivingRangeController', function ($scope, mapping, geotracker, orientation, acceleration, compass) {
 
     /** max swing time - 2 seconds produces no distance/power */
     $scope.maxSwingTime = 2000;
 
     /** swing tracker object */
-    $scope.trackSwing = { isSwinging: false, startTime: 0, coords: {x:0,y:0} };
+    $scope.trackSwing = { isSwinging: false, inPosition: false, startTime: 0, coords: {x:0,y:0,z:0} };
 
     /**
      * init controller
@@ -14,56 +14,104 @@ app.controller('DrivingRangeController', function ($scope, mapping, geotracker, 
         geotracker.getCurrent( function(geo) {
             mapping.create("map-canvas", geo);
             $scope.player = mapping.addMarker('player', 'player', geo.coords);
+            $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
 
-            orientation.subscribe(function(heading) {
+            compass.subscribe(function(heading) {
                 if ($scope.player) {
                     var ico = $scope.player.marker.getIcon();
                     ico.rotation = heading.magneticHeading;
                     $scope.player.marker.setIcon(ico);
                 }
-            })
+            });
+
+            if (compass.available) {
+                compass.start();
+            }
+
+            orientation.subscribe(function(o) {
+                if (o.beta < -75 && !$scope.trackSwing.inPosition) {
+                    $scope.onReadySwing(geo);
+                } else if (o.beta > -60 && $scope.trackSwing.inPosition) {
+                    $scope.onStartSwing();
+                } else if (o.beta > 50 && $scope.trackSwing.isSwinging) {
+                    $scope.onStopSwing();
+                } else if ($scope.trackSwing.isSwinging) {
+                    $scope.trackSwing.wobble.accumulated += o.gamma;
+                    $scope.trackSwing.wobble.samples ++;
+                    $scope.trackSwing.wobble.average = $scope.trackSwing.wobble.accumulated / $scope.trackSwing.wobble.samples;
+                }
+            });
 
             if (orientation.available) {
                 orientation.start();
+            }
+
+            acceleration.subscribe(function(a) {
+                if ($scope.trackSwing.isSwinging) {
+                    $scope.trackSwing.acceleration.accumulated += a.y;
+                    $scope.trackSwing.acceleration.samples ++;
+                    $scope.trackSwing.acceleration.average = $scope.trackSwing.acceleration.accumulated / $scope.trackSwing.acceleration.samples;
+                }
+            });
+
+            if (acceleration.available) {
+                acceleration.start();
             }
         });
     }
 
     /**
-     * on start swing
+     * on ready swing
+     * @param current geo location
      */
-    $scope.onStartSwing = function(event) {
-        $scope.trackSwing.isSwinging = true;
-        $scope.trackSwing.startTime = new Date().getTime();
-        $scope.trackSwing.coords.x = event.x;
-        $scope.trackSwing.coords.y = event.y;
-        $scope.trackSwing.wobble = { accumulated: 0, samples: 0, average: 0 }
+    $scope.onReadySwing = function(geo) {
+        mapping.moveMarkerTo($scope.ball, geo.coords);
+        $scope.trackSwing.isSwinging = false;
+        $scope.trackSwing.inPosition = true;
+        $scope.trackSwing.wobble = { accumulated: 0, samples: 0, average: 0 };
+        $scope.trackSwing.acceleration = { accumulated: 0, samples: 0, average: 0 };
+        navigator.notification.vibrate(100);
     }
 
     /**
-     * on swinging
-     * @param event
+     * on start swing
      */
-    $scope.onSwinging = function(event) {
-        if ($scope.trackSwing.isSwinging) {
-            $scope.trackSwing.wobble.accumulated += $scope.trackSwing.coords.x - event.x;
-            $scope.trackSwing.wobble.samples ++;
-            $scope.trackSwing.wobble.average = $scope.trackSwing.wobble.accumulated / $scope.trackSwing.wobble.samples;
-        }
+    $scope.onStartSwing = function() {
+        $scope.trackSwing.isSwinging = true;
+        $scope.trackSwing.inPosition = false;
+        $scope.trackSwing.startTime = new Date().getTime();
     }
 
     /**
      * on stop swing
      */
-    $scope.onStopSwing = function(event) {
+    $scope.onStopSwing = function() {
         $scope.trackSwing.endTime = new Date().getTime();
         var ttltime = $scope.trackSwing.endTime - $scope.trackSwing.startTime;
-        var ttldist = Math.abs($scope.trackSwing.coords.y - event.y);
-        var power = $scope.maxSwingTime - ttltime;
+        var acc = Math.abs($scope.trackSwing.acceleration.average);
+        var power = ($scope.maxSwingTime - ttltime) * acc;
+
+        console.log($scope.trackSwing.acceleration.samples)
+        console.log("Acc: " + acceleration + " Power: " + power + " time: " + ($scope.maxSwingTime - ttltime))
         if (power < 0 ) { power = 0; }
-        power *= ttldist;
-        $scope.trackSwing.distance = Math.floor(power/1000);
+        $scope.trackSwing.distance = Math.floor(power/100);
         $scope.trackSwing.isSwinging = false;
+        $scope.trackSwing.inPosition = false;
+
+        $scope.hit($scope.trackSwing.distance);
+        navigator.notification.vibrate(1000);
+    }
+
+    /**
+     * hit the ball
+     * @param power
+     * @param direction
+     */
+    $scope.hit = function(power, direction) {
+        $scope.$apply();
+        mapping.animateMarkerBy(
+            $scope.ball, power, compass.heading.magneticHeading -270, {animation: 'arc'}, function() {
+            });
     }
 
     $scope.init();
