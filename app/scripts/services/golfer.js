@@ -12,6 +12,9 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
     /** swing tracker object */
     self.trackSwing = { isSwinging: false, inPosition: false, startTime: 0, coords: {x:0,y:0,z:0} };
 
+    /** club being used */
+    self.club = 'driver';
+
     /**
      * initialize
      */
@@ -28,7 +31,7 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
 
         orientation.subscribe(function(o) {
             // exit method if golfer is not in range of ball
-            if (!self.inRange) {
+            if (!self.inRange && self.club != "putter") {
                 return;
             }
             if (o.beta < -75 && !self.trackSwing.inPosition) {
@@ -74,8 +77,10 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
      * @param is in range (boolean)
      */
     self.setInRange = function(inRange) {
-        self.inRange = inRange;
-        self.trackSwing = { isSwinging: false, inPosition: false, startTime: 0, coords: {x:0,y:0,z:0} };
+        if (inRange != self.inRange) {
+            self.inRange = inRange;
+            self.trackSwing = { isSwinging: false, inPosition: false, startTime: 0, coords: {x:0,y:0,z:0} };
+        }
     }
 
     /**

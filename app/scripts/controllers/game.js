@@ -6,26 +6,25 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
      */
     $scope.init = function() {
         $scope.state = state;
-        geotracker.start();
-        geotracker.subscribe(function() {
+        geotracker.subscribe(function(geo) {
             if (!$scope.initialized) {
-                $scope.initializeGreen();
+                $scope.initializeGreen(geo);
             }
             $scope.updateBall();
             $scope.updateHole();
 
-            mapping.moveMarkerTo($scope.player, geotracker.geo.coords);
+            mapping.moveMarkerTo($scope.player, geo.coords);
             $scope.$apply();
         });
+        geotracker.start();
+    }
 
-        geotracker.getCurrent( function(geo) {
-            mapping.create("map-canvas", geo);
-            $scope.player = mapping.addMarker('player', 'player', geo.coords);
-            $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
-
-            golfer.init();
-            golfer.subscribe($scope.onGolferEvent);
-        });
+    /**
+     * select club
+     * @param club
+     */
+    $scope.selectClub = function(club) {
+        golfer.club = club;
     }
 
     /**
@@ -53,6 +52,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 $scope.swingDetails = params;
                 state.setState($scope, 'Animating');
                 $scope.$apply();
+                console.log("animate")
                 mapping.animateMarkerBy(
                     $scope.ball, params.distance, $scope.heading -270, {animation: 'arc'}, function() {
                         $scope.updateBall();
@@ -66,16 +66,19 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
     /**
      * initialize golf green around user's location
      */
-    $scope.initializeGreen = function() {
+    $scope.initializeGreen = function(geo) {
         $scope.initialized = true;
-        mapping.create("map-canvas");
-        $scope.player = mapping.addMarker('player', 'player');
+        mapping.create("map-canvas", geo);
+        $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
+        $scope.player = mapping.addMarker('player', 'player', geo.coords);
 
+        golfer.init();
+        $scope.golfer = golfer;
+        golfer.subscribe($scope.onGolferEvent);
         state.setState($scope, 'GamePlay.BeforeTeeOff');
 
         // reverse to pop
         $scope.holes.reverse();
-
         $scope.currentHole = $scope.holes.pop();
         $scope.currentHoleMarker = mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
         $scope.$apply();

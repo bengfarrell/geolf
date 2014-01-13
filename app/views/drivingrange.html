@@ -1,8 +1,22 @@
-<h3 ng-click="hit(400)">Driving Range</h3>
+<h3 ng-click="hit(400)">Driving Range
+</h3>
 
 <div class="driving-stats">
-    <h4>Wobble: {{swingDetails.wobble.toFixed(2)}}</h4>
-    <h4>Distance: {{swingDetails.distance}}m</h4>
+    Club:
+    <span class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            {{golfer.club}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li ng-click="selectClub('driver')"><a>Driver</a></li>
+            <li ng-click="selectClub('wood')"><a>Wood</a></li>
+            <li ng-click="selectClub('iron')"><a>Iron</a></li>
+            <li ng-click="selectClub('wedge')"><a>Wedge</a></li>
+            <li ng-click="selectClub('putter')"><a>Putter</a></li>
+        </ul>
+    </span>
+    <span>Wobble: {{swingDetails.wobble.toFixed(2)}}</span>
+    <span>Distance: {{swingDetails.distance}}m</span>
 </div>
 
 

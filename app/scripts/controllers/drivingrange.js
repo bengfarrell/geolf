@@ -8,11 +8,22 @@ app.controller('DrivingRangeController', function ($scope, mapping, geotracker, 
             mapping.create("map-canvas", geo);
             $scope.player = mapping.addMarker('player', 'player', geo.coords);
             $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
+            $scope.golfer = golfer;
 
             golfer.init();
             golfer.setInRange(true);
             golfer.subscribe($scope.onGolferEvent);
+
+            $scope.$apply();
         });
+    }
+
+    /**
+     * select club
+     * @param club
+     */
+    $scope.selectClub = function(club) {
+        golfer.club = club;
     }
 
     /**

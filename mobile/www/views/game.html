@@ -16,24 +16,23 @@
     </div>
 </h3>
 
+<div class="driving-stats">
+    Club:
+    <span class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            {{golfer.club}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li ng-click="selectClub('driver')"><a>Driver</a></li>
+            <li ng-click="selectClub('wood')"><a>Wood</a></li>
+            <li ng-click="selectClub('iron')"><a>Iron</a></li>
+            <li ng-click="selectClub('wedge')"><a>Wedge</a></li>
+            <li ng-click="selectClub('putter')"><a>Putter</a></li>
+        </ul>
+    </span>
+    <span state="GamePlay.AfterTeeOff">Wobble: {{swingDetails.wobble.toFixed(2)}}</span>
+    <span state="GamePlay.AfterTeeOff">Distance: {{swingDetails.distance}}m</span>
+</div>
+
 <div id="map-canvas" class="map"></div>
-
-<button ng-click="teeoff()" ng-disable="{{ball.inRange || !ball}}" state="GamePlay.BeforeTeeOff" class="btn btn-primary btn-geolf">
-    Tee Off
-</button>
-
-<button ng-click="swing()" ng-disable="{{ball.inRange}}" state="GamePlay.AfterTeeOff" class="btn btn-primary btn-geolf">
-    Swing
-</button>
-
-<label ng-hide="orientation.available">
-    Angle
-    <input type="range" ng-change="orientation.forceRefresh()" ng-model="orientation.heading.magneticHeading" name="angle" min="0" max="360">
-</label>
-
-<label>
-    Power <span>{{power}}</span>
-    <input type="range" ng-model="power" name="power" min="0" max="500" ng-init="power=0">
-</label>
-
-<span>{{ball.distanceTo}} meters away</span>
+<span state="GamePlay.AfterTeeOff">{{ball.distanceTo}} meters away</span>

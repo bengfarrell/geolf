@@ -22,12 +22,23 @@
     </div>
 </h3>
 
-<div id="map-canvas" class="map"></div>
-
-<div class="driving-stats"
-    state="GamePlay.AfterTeeOff">
-    <h4>Wobble: {{swingDetails.wobble.toFixed(2)}}</h4>
-    <h4>Distance: {{swingDetails.distance}}m</h4>
+<div class="driving-stats">
+    Club:
+    <span class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            {{golfer.club}} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li ng-click="selectClub('driver')"><a>Driver</a></li>
+            <li ng-click="selectClub('wood')"><a>Wood</a></li>
+            <li ng-click="selectClub('iron')"><a>Iron</a></li>
+            <li ng-click="selectClub('wedge')"><a>Wedge</a></li>
+            <li ng-click="selectClub('putter')"><a>Putter</a></li>
+        </ul>
+    </span>
+    <span state="GamePlay.AfterTeeOff">Wobble: {{swingDetails.wobble.toFixed(2)}}</span>
+    <span state="GamePlay.AfterTeeOff">Distance: {{swingDetails.distance}}m</span>
 </div>
 
+<div id="map-canvas" class="map"></div>
 <span state="GamePlay.AfterTeeOff">{{ball.distanceTo}} meters away</span>
