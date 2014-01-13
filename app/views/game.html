@@ -24,30 +24,10 @@
 
 <div id="map-canvas" class="map"></div>
 
-<button
-        ng-click="teeoff()"
-        ng-disable="{{ball.inRange || !ball}}"
-        state="GamePlay.BeforeTeeOff"
-        class="btn btn-primary btn-geolf">
-    Tee Off
-</button>
+<div class="driving-stats"
+    state="GamePlay.AfterTeeOff">
+    <h4>Wobble: {{swingDetails.wobble.toFixed(2)}}</h4>
+    <h4>Distance: {{swingDetails.distance}}m</h4>
+</div>
 
-<button
-    ng-click="swing()"
-    ng-disable="{{ball.inRange}}"
-    state="GamePlay.AfterTeeOff"
-    class="btn btn-primary btn-geolf">
-    Swing
-</button>
-
-<label ng-hide="compass.available">
-    Angle
-    <input type="range" ng-change="compass.forceRefresh()" ng-model="compass.heading.magneticHeading" name="angle" min="0" max="360">
-</label>
-
-<label>
-    Power <span>{{power}}</span>
-    <input type="range" ng-model="power" name="power" min="0" max="500" ng-init="power=0">
-</label>
-
-<span>{{ball.distanceTo}} meters away</span>
+<span state="GamePlay.AfterTeeOff">{{ball.distanceTo}} meters away</span>
