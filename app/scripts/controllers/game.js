@@ -52,7 +52,6 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 $scope.swingDetails = params;
                 state.setState($scope, 'Animating');
                 $scope.$apply();
-                console.log("animate")
                 mapping.animateMarkerBy(
                     $scope.ball, params.distance, $scope.heading -270, {animation: 'arc'}, function() {
                         $scope.updateBall();
@@ -69,8 +68,8 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
     $scope.initializeGreen = function(geo) {
         $scope.initialized = true;
         mapping.create("map-canvas", geo);
-        $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
         $scope.player = mapping.addMarker('player', 'player', geo.coords);
+        $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
 
         golfer.init();
         $scope.golfer = golfer;

@@ -187,6 +187,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
                 return new google.maps.Marker({
                     map: self.map,
                     position: latlng,
+                    zIndex: -99,
                     flat: true,
                     icon: {
                         anchor: new google.maps.Point(168, 900),
@@ -195,7 +196,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
                         fillOpacity: 1,
                         strokeColor: '',
                         strokeWeight: 0,
-                        scale:.035
+                        scale:.035,
                     }
                 });
 
@@ -203,13 +204,14 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
                 return new google.maps.Marker({
                     map: self.map,
                     position: latlng,
+                    zIndex: 1,
                     icon: new google.maps.MarkerImage(
                         'images/golf-ball.png',
                         new google.maps.Size(15, 15),
                         new google.maps.Point(0, 0),
                         new google.maps.Point(Math.floor(15/2), Math.floor(15/2)),
                         new google.maps.Size(15, 15)
-                    )
+                    ),
                 });
 
             case "dot":
