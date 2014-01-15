@@ -53,7 +53,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 state.setState($scope, 'Animating');
                 $scope.$apply();
                 mapping.animateMarkerBy(
-                    $scope.ball, params.distance, $scope.heading -270, {animation: 'arc'}, function() {
+                    $scope.ball, params.power, params.direction, {animation: 'arc'}, function() {
                         $scope.updateBall();
                         state.setState($scope, 'GamePlay.AfterTeeOff');
                         $scope.$apply();

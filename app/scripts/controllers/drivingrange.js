@@ -49,7 +49,7 @@ app.controller('DrivingRangeController', function ($scope, mapping, geotracker, 
                 $scope.swingDetails = params;
                 $scope.$apply();
                 mapping.animateMarkerBy(
-                    $scope.ball, params.distance, $scope.heading -270, {animation: 'arc'}, function() {
+                    $scope.ball, params.power, params.direction, {animation: 'arc'}, function() {
                     });
                 break;
         }

@@ -196,7 +196,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
                         fillOpacity: 1,
                         strokeColor: '',
                         strokeWeight: 0,
-                        scale:.035,
+                        scale:.035
                     }
                 });
 

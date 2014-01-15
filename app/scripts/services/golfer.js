@@ -15,13 +15,23 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
     /** club being used */
     self.club = 'driver';
 
+    /** club property lookup */
+    self._clubs = {
+        driver: { power: 1, accuracy: .1 },
+        wood: { power: .75,  accuracy: .4 },
+        iron: { power:.5, accuracy: .6 },
+        wedge: { power: .3, accuracy: .9},
+        putter: { power: .1, accuracy: 1 }
+    }
+
     /**
      * initialize
      */
     self.init = function() {
         compass.subscribe(function(heading) {
+            self.currentDirection = heading.magneticHeading -270;
             self.listeners.forEach( function(l) {
-                l.apply(this, ["compassUpdate", {heading: heading.magneticHeading}]);
+                l.apply(this, ["compassUpdate", {heading: heading.magneticHeading -270}]);
             });
         });
 
@@ -113,22 +123,27 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
      * on stop swing
      */
     self.onStopSwing = function() {
-        console.log("stop swing");
         self.trackSwing.endTime = new Date().getTime();
         var ttltime = self.trackSwing.endTime - self.trackSwing.startTime;
-        var acc = Math.abs(self.trackSwing.acceleration.average);
-        var power = (self.maxSwingTime - ttltime) * acc;
-
-        console.log(self.trackSwing.acceleration.samples)
-        console.log("Acc: " + acceleration + " Power: " + power + " time: " + (self.maxSwingTime - ttltime))
-        if (power < 0 ) { power = 0; }
-        self.trackSwing.distance = Math.floor(power/100);
         self.trackSwing.isSwinging = false;
         self.trackSwing.inPosition = false;
 
         navigator.notification.vibrate(1000);
+
+        var hit = {
+            duration: ttltime,
+            acceleration: self.trackSwing.acceleration.average,
+            power: ((self.maxSwingTime - ttltime) * Math.abs(self.trackSwing.acceleration.average) * self._clubs[self.club].power)/100,
+            wobble: self.trackSwing.wobble.average * (1 - self._clubs[self.club].accuracy),
+            direction: self.currentDirection + self.trackSwing.wobble.average * (1 - self._clubs[self.club].accuracy)
+        }
+
+        for (var c in hit) {
+            console.log(c + ": " + hit[c]);
+        }
+
         self.listeners.forEach( function(l) {
-            l.apply(this, ["swingComplete", {distance: self.trackSwing.distance, wobble: self.trackSwing.wobble.average}]);
+            l.apply(this, ["swingComplete", hit]);
         });
     }
 });
