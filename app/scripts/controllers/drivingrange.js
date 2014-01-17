@@ -58,7 +58,7 @@ app.controller('DrivingRangeController', function ($scope, mapping, geotracker, 
                     path = 'straight';
                 }
                 mapping.animateMarkerBy(
-                    $scope.ball, params.power, params.direction, {animation: path}, function() {
+                    $scope.ball, params.power, params.direction, {animation: path, duration: params.power/100}, function() {
                     });
                 break;
         }

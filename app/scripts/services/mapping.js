@@ -11,7 +11,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
             mapTypeId: google.maps.MapTypeId.TERRAIN,
             disableDefaultUI: true
         },
-        animationSteps: 100,
+        animationSteps: 50,
         closeUpZoom: 20,
         cameraAnimationSteps: 100
     };
@@ -86,11 +86,15 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
     this.animateMarkerBy = function(ref, distance, angle, config, callback) {
         var distance_step = distance / self.config.animationSteps;
         var frames = [];
-        for (var c = 0; c < self.config.animationSteps; c++) {
+        var animSteps = self.config.animationSteps;
+        if (config.duration) {
+            animSteps *= config.duration;
+        }
+        for (var c = 0; c < animSteps; c++) {
             var obj = {};
             obj.coords = geomath.projectOut(ref.coords, distance_step * c, angle-90);
             if (config.animation == "arc") {
-                obj.size = ref.marker.icon.size.width * Math.sin(c / self.config.animationSteps * Math.PI) + ref.marker.icon.size.width
+                obj.size = ref.marker.icon.size.width * Math.sin(c / animSteps * Math.PI) + ref.marker.icon.size.width
             }
             frames.push(obj);
         }
