@@ -89,7 +89,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
         for (var c = 0; c < self.config.animationSteps; c++) {
             var obj = {};
             obj.coords = geomath.projectOut(ref.coords, distance_step * c, angle-90);
-            if (config.animation = "arc") {
+            if (config.animation == "arc") {
                 obj.size = ref.marker.icon.size.width * Math.sin(c / self.config.animationSteps * Math.PI) + ref.marker.icon.size.width
             }
             frames.push(obj);

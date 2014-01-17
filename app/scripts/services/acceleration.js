@@ -2,7 +2,7 @@ app.service('acceleration', function() {
     var self = this;
 
     this.config = {
-        frequency: 100
+        frequency: 1000
     };
 
     /** is accelerometer available ? */
@@ -44,12 +44,13 @@ app.service('acceleration', function() {
      *
      */
     this.start = function(config) {
+
         if (!self.available) { return false; }
         if (config) { self.config = config; }
         self.accelerationWatch = navigator.accelerometer.watchAcceleration(
             self.updated, function(ex) {
                 console.log("accel fail (" + ex.name + ": " + ex.message + ")");
-            }, {frequency: 500});
+            }, {frequency: 250});
     };
 
     /**
@@ -67,6 +68,13 @@ app.service('acceleration', function() {
      */
     this.subscribe = function(callback) {
         self.listeners.push(callback);
+    }
+
+    /**
+     * remove all the listeners
+     */
+    this.removeAllListeners = function() {
+        self.listeners = [];
     }
 
     /**

@@ -4,13 +4,17 @@ app.controller('DrivingRangeController', function ($scope, mapping, geotracker, 
      * init controller
      */
     $scope.init = function() {
+        $scope.$on('$destroy', function () {
+            golfer.stop();
+        });
+
         geotracker.getCurrent( function(geo) {
             mapping.create("map-canvas", geo);
             $scope.player = mapping.addMarker('player', 'player', geo.coords);
             $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
             $scope.golfer = golfer;
 
-            golfer.init();
+            golfer.start();
             golfer.setInRange(true);
             golfer.subscribe($scope.onGolferEvent);
 
@@ -48,8 +52,13 @@ app.controller('DrivingRangeController', function ($scope, mapping, geotracker, 
             case "swingComplete":
                 $scope.swingDetails = params;
                 $scope.$apply();
+
+                var path = 'arc';
+                if (params.club == 'putter') {
+                    path = 'straight';
+                }
                 mapping.animateMarkerBy(
-                    $scope.ball, params.power, params.direction, {animation: 'arc'}, function() {
+                    $scope.ball, params.power, params.direction, {animation: path}, function() {
                     });
                 break;
         }

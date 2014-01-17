@@ -65,6 +65,13 @@ app.service('orientation', function() {
     }
 
     /**
+     * remove all the listeners
+     */
+    this.removeAllListeners = function() {
+        self.listeners = [];
+    }
+
+    /**
      * update orientation
      * @param orientation
      */

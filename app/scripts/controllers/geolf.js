@@ -1,8 +1,12 @@
 'use strict';
-app.controller('GeolfController', function ($scope) {
+app.controller('GeolfController', function ($scope, golfer) {
 
     document.addEventListener("deviceready", function() {
         window.plugins.orientationLock.lock("portrait");
+    }, false);
+
+    document.addEventListener("pause", function() {
+        golfer.stop();
     }, false);
 
     // holes on our generated green

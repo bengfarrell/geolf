@@ -25,9 +25,9 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
     }
 
     /**
-     * initialize
+     * start golfer service
      */
-    self.init = function() {
+    self.start = function() {
         compass.subscribe(function(heading) {
             self.currentDirection = heading.magneticHeading -270;
             self.listeners.forEach( function(l) {
@@ -72,6 +72,18 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
         if (acceleration.available) {
             acceleration.start();
         }
+    }
+
+    /**
+     * stop service
+     */
+    self.stop = function() {
+        compass.stop();
+        compass.removeAllListeners();
+        orientation.stop();
+        orientation.removeAllListeners();
+        acceleration.stop();
+        acceleration.removeAllListeners();
     }
 
     /**
@@ -132,14 +144,12 @@ app.service('golfer', function(mapping, geotracker, orientation, acceleration, c
 
         var hit = {
             duration: ttltime,
-            acceleration: self.trackSwing.acceleration.average,
-            power: ((self.maxSwingTime - ttltime) * Math.abs(self.trackSwing.acceleration.average) * self._clubs[self.club].power)/100,
-            wobble: self.trackSwing.wobble.average * (1 - self._clubs[self.club].accuracy),
-            direction: self.currentDirection + self.trackSwing.wobble.average * (1 - self._clubs[self.club].accuracy)
-        }
-
-        for (var c in hit) {
-            console.log(c + ": " + hit[c]);
+            acceleration: parseInt(self.trackSwing.acceleration.average),
+            power: parseInt(((self.maxSwingTime - ttltime) * Math.abs(self.trackSwing.acceleration.average) * self._clubs[self.club].power)/100),
+            wobble: parseInt(self.trackSwing.wobble.average * (1 - self._clubs[self.club].accuracy)),
+            direction: parseInt(self.currentDirection + self.trackSwing.wobble.average * (1 - self._clubs[self.club].accuracy)),
+            facing: parseInt(self.currentDirection),
+            club: self.club
         }
 
         self.listeners.forEach( function(l) {

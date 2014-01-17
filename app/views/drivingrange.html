@@ -15,9 +15,18 @@
             <li ng-click="selectClub('putter')"><a>Putter</a></li>
         </ul>
     </span>
-    <span>Wobble: {{swingDetails.wobble.toFixed(2)}}</span>
-    <span>Distance: {{swingDetails.distance}}m</span>
 </div>
 
-
 <div id="map-canvas" class="map"></div>
+
+<div>
+    <span>Distance: {{swingDetails.power}}m</span>
+    <span>Direction: {{swingDetails.direction}}</span>
+    <span>Facing: {{swingDetails.facing}}</span>
+</div>
+
+<div>
+    <span>Wobble: {{swingDetails.wobble.toFixed(2)}}</span>
+    <span>Duration: {{swingDetails.duration}}</span>
+    <span>Acceleration: {{swingDetails.acceleration}}</span>
+</div>

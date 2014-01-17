@@ -70,6 +70,13 @@ app.service('compass', function() {
     }
 
     /**
+     * remove all the listeners
+     */
+    this.removeAllListeners = function() {
+        self.listeners = [];
+    }
+
+    /**
      * update heading
      * @param heading
      */

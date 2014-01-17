@@ -5,6 +5,10 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
      * init controller
      */
     $scope.init = function() {
+        $scope.$on('$destroy', function () {
+            golfer.stop();
+        });
+
         $scope.state = state;
         geotracker.subscribe(function(geo) {
             if (!$scope.initialized) {
@@ -52,8 +56,13 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 $scope.swingDetails = params;
                 state.setState($scope, 'Animating');
                 $scope.$apply();
+
+                var path = 'arc';
+                if (params.club == 'putter') {
+                    path = 'straight';
+                }
                 mapping.animateMarkerBy(
-                    $scope.ball, params.power, params.direction, {animation: 'arc'}, function() {
+                    $scope.ball, params.power, params.direction, {animation: path}, function() {
                         $scope.updateBall();
                         state.setState($scope, 'GamePlay.AfterTeeOff');
                         $scope.$apply();
@@ -71,7 +80,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
         $scope.player = mapping.addMarker('player', 'player', geo.coords);
         $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
 
-        golfer.init();
+        golfer.start();
         $scope.golfer = golfer;
         golfer.subscribe($scope.onGolferEvent);
         state.setState($scope, 'GamePlay.BeforeTeeOff');
