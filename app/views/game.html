@@ -40,5 +40,7 @@
     <span state="GamePlay.AfterTeeOff">Distance: {{swingDetails.distance}}m</span>
 </div>
 
-<div id="map-canvas" class="map"></div>
+<div id="map-canvas" class="map" state="mapAvailable"></div>
+<div class="map unavailable" state="mapUnavailable">maps not available, please check your internet connection</div>
+
 <span state="GamePlay.AfterTeeOff">{{ball.distanceTo}} meters away</span>

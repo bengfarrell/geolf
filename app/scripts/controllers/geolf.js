@@ -1,5 +1,5 @@
 'use strict';
-app.controller('GeolfController', function ($scope, golfer) {
+app.controller('GeolfController', function ($scope, golfer, serviceunavailable) {
 
     document.addEventListener("deviceready", function() {
         window.plugins.orientationLock.lock("portrait");

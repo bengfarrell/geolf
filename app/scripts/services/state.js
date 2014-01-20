@@ -8,6 +8,14 @@ app.service('state', function() {
     this.currentState = "none";
 
     /**
+     * attach the state object for this controller and start watching
+     * @param scope
+     */
+    this.attachController = function(scope) {
+        scope.state = self;
+    }
+
+    /**
      * set our current state
      * @param state
      */

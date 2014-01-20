@@ -1,9 +1,13 @@
 'use strict';
-app.controller('DrivingRangeController', function ($scope, mapping, geotracker, golfer) {
+app.controller('DrivingRangeController', function ($scope, mapping, geotracker, golfer, state) {
     /**
      * init controller
      */
     $scope.init = function() {
+        state.attachController($scope);
+        if (mapping.available) { state.setState($scope, 'mapAvailable'); }
+        else { state.setState($scope, 'mapUnavailable');  }
+
         $scope.$on('$destroy', function () {
             golfer.stop();
         });

@@ -9,7 +9,10 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
             golfer.stop();
         });
 
-        $scope.state = state;
+        state.attachController($scope);
+        if (mapping.available) { state.setState($scope, 'GamePlay.mapAvailable'); }
+        else { state.setState($scope, 'GamePlay.mapUnavailable');  }
+
         geotracker.subscribe(function(geo) {
             if (!$scope.initialized) {
                 $scope.initializeGreen(geo);
@@ -54,7 +57,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
 
             case "swingComplete":
                 $scope.swingDetails = params;
-                state.setState($scope, 'Animating');
+                state.setState($scope, 'Animating.mapAvailable');
                 $scope.$apply();
 
                 var path = 'arc';
@@ -64,7 +67,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 mapping.animateMarkerBy(
                     $scope.ball, params.power, params.direction, {animation: path}, function() {
                         $scope.updateBall();
-                        state.setState($scope, 'GamePlay.AfterTeeOff');
+                        state.setState($scope, 'GamePlay.AfterTeeOff.mapAvailable');
                         $scope.$apply();
                     });
                 break;
@@ -83,7 +86,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
         golfer.start();
         $scope.golfer = golfer;
         golfer.subscribe($scope.onGolferEvent);
-        state.setState($scope, 'GamePlay.BeforeTeeOff');
+        state.setState($scope, 'GamePlay.BeforeTeeOff.mapAvailable');
 
         // reverse to pop
         $scope.holes.reverse();
@@ -96,7 +99,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
      * send camera to find ball
      */
     $scope.locateBall = function() {
-        state.setState($scope, 'Animating');
+        state.setState($scope, 'Animating.mapAvailable');
         mapping.animateCameraTo($scope.ball.coords, {animation: 'arc', returnToOriginal: true}, function() {
             state.undoState();
             $scope.$apply();
@@ -107,7 +110,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
      * send camera to find hole
      */
     $scope.locateHole = function() {
-        state.setState($scope, 'Animating');
+        state.setState($scope, 'Animating.mapAvailable');
         mapping.animateCameraTo($scope.currentHole.location, {animation: 'arc', returnToOriginal: true}, function() {
             state.undoState();
             $scope.$apply();

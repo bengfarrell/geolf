@@ -36,6 +36,15 @@ h1 .btn {
     height: 300px;
 }
 
+.map.unavailable, .tinymap.unavailable {
+    background-color: #999999;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #555555;
+    color: #eeeeee;
+    padding: 20px;
+}
+
 .tinymap {
     height: 250px;
 }

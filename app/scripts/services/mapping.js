@@ -1,6 +1,12 @@
 app.service('mapping', function($http, geotracker, geomath, animation) {
     var self = this;
 
+    if (typeof google == "undefined" ) {
+        self.available = false;
+    } else {
+        self.available = true;
+    }
+
     /** markers by name */
     this.markers = {};
 
@@ -8,7 +14,7 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
     this.config = {
         google: {
             zoom: 16,
-            mapTypeId: google.maps.MapTypeId.TERRAIN,
+            mapTypeId: self.available ? google.maps.MapTypeId.TERRAIN : "none",
             disableDefaultUI: true
         },
         animationSteps: 50,
@@ -221,14 +227,14 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
             case "dot":
                 return new google.maps.Marker({
                     map: self.map,
-                    position: latlng,
-                    icon: new google.maps.MarkerImage(
+                    position: latlng
+                   /* icon: new google.maps.MarkerImage(
                         'images/reddot.png',
                         new google.maps.Size(8, 8),
                         new google.maps.Point(0, 0),
                         new google.maps.Point(Math.floor(8/2), Math.floor(8/2)),
                         new google.maps.Size(8, 8)
-                    )
+                    )*/
                 });
 
             default:

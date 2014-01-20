@@ -4,7 +4,7 @@ app.directive('state', function () {
             if(!actual_value) {
                 return;
             }
-            if (actual_value.substr(0, attrs.state.length) == attrs.state) {
+            if (actual_value.indexOf(attrs.state) != -1) {
                 element.css("display", "");
             } else {
                 element.css("display", "none");
