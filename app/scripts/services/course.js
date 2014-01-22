@@ -89,7 +89,7 @@ app.service('course', function(places) {
         self.score = 0;
         for (var h = 0; h < self.holes.length; h++) {
             if (self.holes[h].stroke > 0) {
-                self.score += self.holes[h].stroke - self.holes[h].par;
+                self.score += self.holes[h].par - self.holes[h].stroke;
             }
         }
     }

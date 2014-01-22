@@ -85,16 +85,20 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
         $scope.initialized = true;
         mapping.create("map-canvas", geo);
         $scope.player = mapping.addMarker('player', 'player', geo.coords);
-        $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
+        $scope.currentHole = course.getCurrentHole();
+
+        if ($scope.currentHole && $scope.currentHole.ballLocation) {
+            $scope.ball = mapping.addMarker('ball', 'ball', $scope.currentHole.ballLocation);
+        } else {
+            $scope.ball = mapping.addMarker('ball', 'ball', geo.coords);
+        }
 
         golfer.start();
         $scope.golfer = golfer;
         golfer.subscribe($scope.onGolferEvent);
         state.setState($scope, 'GamePlay.BeforeTeeOff.mapAvailable');
 
-        course.getCurrentHole().marker = mapping.addMarker('loc', course.getCurrentHole().name, course.getCurrentHole().location);
-
-        $scope.currentHole = course.getCurrentHole();
+        $scope.currentHole.marker = mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
         $scope.$apply();
     }
 
@@ -128,6 +132,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
             $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
             $scope.ball.distanceToHole = geomath.calculateDistance(course.getCurrentHole().location, $scope.ball.coords);
             $scope.ball.inRange = ($scope.ball.distanceTo < 10) || $scope.debug;
+            $scope.currentHole.ballLocation = $scope.ball.coords;
             golfer.setInRange($scope.ball.inRange);
 
             if ($scope.ball.distanceToHole < 50) {
