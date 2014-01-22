@@ -227,14 +227,14 @@ app.service('mapping', function($http, geotracker, geomath, animation) {
             case "dot":
                 return new google.maps.Marker({
                     map: self.map,
-                    position: latlng
-                   /* icon: new google.maps.MarkerImage(
-                        'images/reddot.png',
-                        new google.maps.Size(8, 8),
+                    position: latlng,
+                    icon: new google.maps.MarkerImage(
+                        'images/dot.png',
+                        new google.maps.Size(16, 16),
                         new google.maps.Point(0, 0),
-                        new google.maps.Point(Math.floor(8/2), Math.floor(8/2)),
-                        new google.maps.Size(8, 8)
-                    )*/
+                        new google.maps.Point(Math.floor(16/2), Math.floor(16/2)),
+                        new google.maps.Size(16, 16)
+                    )
                 });
 
             default:

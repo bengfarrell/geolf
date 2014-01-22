@@ -1,11 +1,13 @@
 'use strict';
-app.controller('GameController', function ($scope, $location, compass, geotracker, geomath, mapping, state, golfer) {
+app.controller('GameController', function ($scope, $location, compass, geotracker, geomath, mapping, state, golfer, course) {
 
     /**
      * init controller
      */
     $scope.init = function() {
         $scope.$on('$destroy', function () {
+            $scope.initialized = false;
+            geotracker.stop();
             golfer.stop();
         });
 
@@ -88,10 +90,9 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
         golfer.subscribe($scope.onGolferEvent);
         state.setState($scope, 'GamePlay.BeforeTeeOff.mapAvailable');
 
-        // reverse to pop
-        $scope.holes.reverse();
-        $scope.currentHole = $scope.holes.pop();
-        $scope.currentHoleMarker = mapping.addMarker('loc', $scope.currentHole.name, $scope.currentHole.location);
+        course.getCurrentHole().marker = mapping.addMarker('loc', course.getCurrentHole().name, course.getCurrentHole().location);
+
+        $scope.currentHole = course.getCurrentHole();
         $scope.$apply();
     }
 
@@ -111,7 +112,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
      */
     $scope.locateHole = function() {
         state.setState($scope, 'Animating.mapAvailable');
-        mapping.animateCameraTo($scope.currentHole.location, {animation: 'arc', returnToOriginal: true}, function() {
+        mapping.animateCameraTo(course.getCurrentHole().location, {animation: 'arc', returnToOriginal: true}, function() {
             state.undoState();
             $scope.$apply();
         });
@@ -123,13 +124,13 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
     $scope.updateBall = function() {
         if ($scope.ball) {
             $scope.ball.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.ball.coords);
-            $scope.ball.distanceToHole = geomath.calculateDistance($scope.currentHole.location, $scope.ball.coords);
+            $scope.ball.distanceToHole = geomath.calculateDistance(course.getCurrentHole().location, $scope.ball.coords);
             $scope.ball.inRange = ($scope.ball.distanceTo < 10) || $scope.debug;
             golfer.setInRange($scope.ball.inRange);
 
             if ($scope.ball.distanceToHole < 50) {
-                $scope.currentHole = $scope.holes.pop();
-                mapping.moveMarkerTo($scope.currentHoleMarker, $scope.currentHole.location);
+                $scope.currentHole = course.getNextHole();
+                mapping.moveMarkerTo(course.getCurrentHole().marker, course.getCurrentHole().location);
                 $scope.updateBall();
                 $scope.updateHole();
             }
@@ -140,9 +141,9 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
      * update hole with new coords
      */
     $scope.updateHole = function() {
-        if ($scope.currentHole) {
-            $scope.currentHole.bearingTo = geomath.calculateBearing(geotracker.geo.coords, $scope.currentHole.location) -180;
-            $scope.currentHole.distanceTo = geomath.calculateDistance(geotracker.geo.coords, $scope.currentHole.location);
+        if (course.getCurrentHole()) {
+            course.getCurrentHole().bearingTo = geomath.calculateBearing(geotracker.geo.coords, course.getCurrentHole().location) -180;
+            course.getCurrentHole().distanceTo = geomath.calculateDistance(geotracker.geo.coords, course.getCurrentHole().location);
         }
     }
 

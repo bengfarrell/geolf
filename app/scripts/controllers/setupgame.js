@@ -1,14 +1,15 @@
 'use strict';
-app.controller('SetupGameController', function ($scope, $location, geotracker, places, mapping, state, compass) {
+app.controller('SetupGameController', function ($scope, $location, geotracker, course, mapping, state) {
     /**
      * constructor
      */
     $scope.init = function() {
-        $scope.state = state;
+        state.attachController($scope);
+        $scope.course = course;
         state.setState($scope, "Loading");
         geotracker.getCurrent(function(geo) {
             mapping.create("map-canvas", geo);
-            places.search(500, $scope.onPlaces, geo);
+            course.load(geo, $scope.onCourseLoaded);
         });
     }
 
@@ -27,16 +28,19 @@ app.controller('SetupGameController', function ($scope, $location, geotracker, p
 
 
     /**
-     * on place retrieval
+     * on course loaded
      */
-    $scope.onPlaces = function() {
+    $scope.onCourseLoaded = function() {
         $scope.previewHoleIndex = 0;
-        mapping.animateCameraTo(places.places[$scope.previewHoleIndex].location);
-        $scope.previewMarker = mapping.addMarker("fdefault", "marker", places.places[$scope.previewHoleIndex].location)
+        $scope.currentHole = course.getHoleAtIndex($scope.previewHoleIndex);
+
+        mapping.animateCameraTo($scope.currentHole.location);
+        $scope.previewMarker = mapping.addMarker("default", "marker", $scope.currentHole.location);
+
+        for (var c in course.holes) {
+            course.holes[c].marker = mapping.addMarker("dot", "marker", course.holes[c].location);
+        }
         state.setState($scope, "Loaded");
-        $scope.$parent.holes = places.places.slice();
-        $scope.$parent.holes.reverse();
-        $scope._refreshMarkers();
         $scope.$apply();
     }
 
@@ -45,12 +49,12 @@ app.controller('SetupGameController', function ($scope, $location, geotracker, p
      */
     $scope.previewNextHole = function() {
         $scope.previewHoleIndex ++;
-        if ($scope.previewHoleIndex >= $scope.$parent.holes.length) {
+        if ($scope.previewHoleIndex >= course.holes.length) {
             $scope.previewHoleIndex = 0;
         }
-        $scope.currentHole = $scope.$parent.holes[$scope.previewHoleIndex];
-        mapping.animateCameraTo($scope.$parent.holes[$scope.previewHoleIndex].location);
-        mapping.moveMarkerTo($scope.previewMarker, $scope.$parent.holes[$scope.previewHoleIndex].location);
+        $scope.currentHole = course.getHoleAtIndex($scope.previewHoleIndex);
+        mapping.animateCameraTo($scope.currentHole.location);
+        mapping.moveMarkerTo($scope.previewMarker, $scope.currentHole.location);
     }
 
     /**
@@ -59,11 +63,11 @@ app.controller('SetupGameController', function ($scope, $location, geotracker, p
     $scope.previewLastHole = function() {
         $scope.previewHoleIndex --;
         if ($scope.previewHoleIndex < 0) {
-            $scope.previewHoleIndex = $scope.holes.length-1;
+            $scope.previewHoleIndex = course.holes.length-1;
         }
-        $scope.currentHole = $scope.$parent.holes[$scope.previewHoleIndex];
-        mapping.animateCameraTo($scope.$parent.holes[$scope.previewHoleIndex].location);
-        mapping.moveMarkerTo($scope.previewMarker, $scope.$parent.holes[$scope.previewHoleIndex].location);
+        $scope.currentHole = course.getHoleAtIndex($scope.previewHoleIndex);
+        mapping.animateCameraTo($scope.currentHole.location);
+        mapping.moveMarkerTo($scope.previewMarker, $scope.currentHole.location);
     }
 
     /**
@@ -73,12 +77,13 @@ app.controller('SetupGameController', function ($scope, $location, geotracker, p
         if (!index) {
             index = $scope.previewHoleIndex;
         }
-        mapping.removeMarker($scope.$parent.holes[index].marker);
-        $scope.$parent.holes.splice(index, 1);
-        $scope.currentHole = $scope.$parent.holes[index];
-        mapping.animateCameraTo($scope.$parent.holes[index].location);
-        mapping.moveMarkerTo($scope.previewMarker, $scope.$parent.holes[index].location);
-        $scope.$apply();
+        var hole = course.getHoleAtIndex(index);
+        mapping.removeMarker(hole.marker);
+        course.removeHole(hole);
+
+        $scope.currentHole = course.getHoleAtIndex($scope.previewHoleIndex);
+        mapping.animateCameraTo($scope.currentHole.location);
+        mapping.moveMarkerTo($scope.previewMarker, $scope.currentHole.location);
     }
 
     /**
@@ -86,17 +91,16 @@ app.controller('SetupGameController', function ($scope, $location, geotracker, p
      * @param numHoles
      */
     $scope.quickCourse = function(numHoles) {
-        // reset holes from places data
-        $scope.$parent.holes = places.places.slice();
-        while ($scope.$parent.holes.length > numHoles) {
-            var hle = $scope.$parent.holes.pop();
-            mapping.removeMarker(hle.marker);
+        // remove all markers
+        for (var c = 0; c < course.holes.length; c++) {
+            mapping.removeMarker(course.getHoleAtIndex(c).marker);
         }
+
+        course.generateCourse(numHoles);
         $scope._refreshMarkers();
         $scope.previewHoleIndex = 0;
-        $scope.currentHole = $scope.$parent.holes[$scope.previewHoleIndex];
-        mapping.animateCameraTo($scope.$parent.holes[$scope.previewHoleIndex].location);
-        mapping.moveMarkerTo($scope.previewMarker, $scope.$parent.holes[$scope.previewHoleIndex].location);
+        mapping.animateCameraTo(course.getHoleAtIndex($scope.previewHoleIndex).location);
+        mapping.moveMarkerTo($scope.previewMarker, course.getHoleAtIndex($scope.previewHoleIndex).location);
     }
 
     /**
@@ -104,12 +108,10 @@ app.controller('SetupGameController', function ($scope, $location, geotracker, p
      * @private
      */
     $scope._refreshMarkers = function() {
-        for (var c = 0; c < $scope.$parent.holes.length; c++) {
-            $scope.$parent.holes[c].num = c +1;
-            var mrkr = mapping.addMarker("dot", "marker", $scope.$parent.holes[c].location);
-            $scope.$parent.holes[c].marker = mrkr;
+        for (var c = 0; c < course.holes.length; c++) {
+            var mrkr = mapping.addMarker("dot", "marker", course.getHoleAtIndex(c).location);
+            course.getHoleAtIndex(c).marker = mrkr;
         }
-
     }
 
     $scope.init();

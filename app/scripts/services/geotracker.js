@@ -27,8 +27,20 @@ app.service('geotracker', function() {
         if (config) {
             self.config = config;
         }
-        navigator.geolocation.watchPosition(self.updated, self.error, self.config);
+        if (self.watchID) {
+            navigator.geolocation.clearWatch(self.watchID);
+        }
+        self.watchID = navigator.geolocation.watchPosition(self.updated, self.error, self.config);
     };
+
+    /**
+     * stop tracking
+     */
+    this.stop = function() {
+        if (self.watchID) {
+            navigator.geolocation.clearWatch(self.watchID);
+        }
+    }
 
     /**
      * subscribe to geo service

@@ -1,5 +1,5 @@
 'use strict';
-app.controller('GeolfController', function ($scope, golfer, serviceunavailable) {
+app.controller('GeolfController', function ($scope, $location, golfer, serviceunavailable) {
 
     document.addEventListener("deviceready", function() {
         window.plugins.orientationLock.lock("portrait");
@@ -9,9 +9,22 @@ app.controller('GeolfController', function ($scope, golfer, serviceunavailable) 
         golfer.stop();
     }, false);
 
-    // holes on our generated green
-    $scope.holes = [];
-
     // debug
     $scope.debug = false;
+
+    /**
+     * go to specific view
+     * @param view
+     */
+    $scope.gotoView = function(view) {
+        switch (view) {
+            case "scorecard":
+                $location.url('/scorecard');
+                break;
+
+            case "game":
+                $location.url('/game');
+                break;
+        }
+    }
 });

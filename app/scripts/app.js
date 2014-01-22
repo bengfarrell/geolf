@@ -19,6 +19,10 @@ app.config(function ($routeProvider) {
             templateUrl: 'views/game.html',
             controller: 'GameController'
         })
+        .when('/scorecard', {
+            templateUrl: 'views/scorecard.html',
+            controller: 'ScoreCardController'
+        })
       .otherwise({
         redirectTo: '/'
       });

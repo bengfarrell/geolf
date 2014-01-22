@@ -6,6 +6,9 @@ app.service('serviceunavailable', function(geotracker, mapping) {
     }
 
     self.onError = function(err) {
+        if (!err.error) {
+           return; //not an error
+        }
         console.log(err)
     }
 

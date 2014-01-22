@@ -10,6 +10,7 @@ app.controller('DrivingRangeController', function ($scope, mapping, geotracker, 
 
         $scope.$on('$destroy', function () {
             golfer.stop();
+            geotracker.stop();
         });
 
         geotracker.getCurrent( function(geo) {
