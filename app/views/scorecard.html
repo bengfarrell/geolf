@@ -1,2 +1,21 @@
 <h1>Scorecard</h1>
-<button ng-click="gotoView('game')">Game</button>
+
+<div class="pull-right scorecarddashboard">
+    <span class="currentscore">Current Score: {{course.score}}</span>
+    <button class="btn btn-primary btn-geolf" ng-click="gotoView('game')">
+        back to game
+    </button>
+</div>
+
+<table class="scorecard">
+    <tr class="header">
+        <td>Hole</td>
+        <td>Par</td>
+        <td>Stroke</td>
+    </tr>
+    <tr class="scores {{hole.index == course.index ? 'current': '' }}" ng-repeat="hole in course.holes">
+        <td class="hole">#{{hole.num}} {{hole.name}}</td>
+        <td>{{hole.par}}</td>
+        <td>{{hole.stroke}}</td>
+    </tr>
+</table>

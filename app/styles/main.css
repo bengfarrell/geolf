@@ -27,6 +27,47 @@ h1 {
     padding: 15px;
 }
 
+.scorecard {
+    width: 100%;
+}
+
+.scorecard .header td {
+    background-color: #2a2a2a;
+    color: #fafafa;
+    font-weight: bold;
+    font-size: 18px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #2a2a2a;
+    padding: 5px;
+    text-align: center;
+}
+
+.scorecard .scores td {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #2a2a2a;
+    padding: 5px;
+    text-align: right;
+}
+
+.scorecard .scores td.hole {
+    text-align: left;
+}
+
+.scorecard tr.scores.current {
+    background-color: #E2CEA0;
+}
+
+.scorecarddashboard {
+    margin: 10px;
+}
+
+.scorecarddashboard .currentscore {
+    font-size: 18px;
+    vertical-align: middle;
+}
+
 h1 .btn {
     font-family: pt-sans, sans-serif;
 }

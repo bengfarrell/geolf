@@ -7,6 +7,7 @@ app.service('course', function(places) {
      */
     self.load = function(geo, callback) {
         self._cb = callback;
+        self.score = 0;
         places.search(500, self._onPlaces, geo);
     }
 
@@ -56,11 +57,11 @@ app.service('course', function(places) {
      * @returns {*}
      */
     self.getCurrentHole = function() {
-        if (!self._indx || self._indx < 0) {
-            self._indx = 0;
+        if (!self.index || self.index < 0) {
+            self.index = 0;
         }
 
-        return self.holes[self._indx];
+        return self.holes[self.index];
     }
 
     /**
@@ -68,16 +69,29 @@ app.service('course', function(places) {
      * @returns {*}
      */
     self.getNextHole = function() {
-        if (!self._indx || self._indx < 0) {
-            self._indx = 0;
+        self.refreshScore();
+        if (!self.index || self.index < 0) {
+            self.index = 0;
         } else {
-            self._indx ++;
+            self.index ++;
         }
 
-        if (self._indx >= self.holes.length) {
-            self._indx = 0;
+        if (self.index >= self.holes.length) {
+            self.index = 0;
         }
-        return self.holes[self._indx];
+        return self.holes[self.index];
+    }
+
+    /**
+     * refresh score
+     */
+    self.refreshScore = function() {
+        self.score = 0;
+        for (var h = 0; h < self.holes.length; h++) {
+            if (self.holes[h].stroke > 0) {
+                self.score += self.holes[h].stroke - self.holes[h].par;
+            }
+        }
     }
 
     /**
@@ -88,6 +102,8 @@ app.service('course', function(places) {
         for (var h = 0; h < self.holes.length; h++) {
             self.holes[h].index = h;
             self.holes[h].num = h+1;
+            self.holes[h].par = 3;
+            self.holes[h].stroke = 0;
         }
     }
 

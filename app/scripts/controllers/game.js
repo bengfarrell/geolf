@@ -58,6 +58,8 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 break;
 
             case "swingComplete":
+                course.getCurrentHole().stroke ++;
+                course.refreshScore();
                 $scope.swingDetails = params;
                 state.setState($scope, 'Animating.mapAvailable');
                 $scope.$apply();
@@ -133,6 +135,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 mapping.moveMarkerTo(course.getCurrentHole().marker, course.getCurrentHole().location);
                 $scope.updateBall();
                 $scope.updateHole();
+                $scope.gotoView('scorecard');
             }
         }
     }
