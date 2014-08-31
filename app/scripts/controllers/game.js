@@ -1,5 +1,5 @@
 'use strict';
-app.controller('GameController', function ($scope, $location, compass, geotracker, geomath, mapping, state, golfer, course) {
+app.controller('GameController', function ($scope, $location, compass, geotracker, geomath, mapping, state, golfer, course, pubnub, keyboard) {
 
     /**
      * init controller
@@ -15,6 +15,35 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
         if (mapping.available) { state.setState($scope, 'GamePlay.mapAvailable'); }
         else { state.setState($scope, 'GamePlay.mapUnavailable');  }
 
+        //if ($routeParams.mode == ":war") {
+            $scope.initMultiplayer();
+        //}
+
+        keyboard.subscribe(function(eventtype, key, event) {
+            // fake a swing using the b key
+            if (eventtype == "keypress" && key == "B" ) {
+                $scope.onGolferEvent("swingComplete", { power: 450, direction: Math.random()*360 } );
+            }
+
+            // keyboard control over our location for debugging
+            var x = 0;
+            var y = 0;
+            if (event.keyCode == 37) { y -= 0.0002; }
+            if (event.keyCode == 39) { y += 0.0002; }
+
+            if (event.keyCode == 38) { x -= 0.0002; }
+            if (event.keyCode == 40) { x += 0.0002; }
+
+            if (eventtype == "keydown") {
+                geotracker.geo.coords.latitude += x;
+                geotracker.geo.coords.longitude += y;
+
+                pubnub.updateGeo(geotracker.geo);
+                mapping.moveMarkerTo($scope.player, geotracker.geo.coords);
+                $scope.$apply();
+            }
+        });
+
         geotracker.subscribe(function(geo) {
             if (!$scope.initialized) {
                 $scope.initializeGreen(geo);
@@ -25,7 +54,7 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
             mapping.moveMarkerTo($scope.player, geo.coords);
             $scope.$apply();
         });
-        geotracker.start();
+        geotracker.start({}, true);
     }
 
     /**
@@ -68,9 +97,12 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
                 if (params.club == 'putter') {
                     path = 'straight';
                 }
+
+                pubnub.updateBall({coords: $scope.ball.coords, state: "hit", power: params.power, direction: params.direction, path: path } );
                 mapping.animateMarkerBy(
                     $scope.ball, params.power, params.direction, {animation: path}, function() {
                         $scope.updateBall();
+                       // pubnub.updateBall( { coords: $scope.ball.coords, state: "inplay" } );
                         state.setState($scope, 'GamePlay.AfterTeeOff.mapAvailable');
                         $scope.$apply();
                     });
@@ -153,6 +185,59 @@ app.controller('GameController', function ($scope, $location, compass, geotracke
             course.getCurrentHole().bearingTo = geomath.calculateBearing(geotracker.geo.coords, course.getCurrentHole().location) -180;
             course.getCurrentHole().distanceTo = geomath.calculateDistance(geotracker.geo.coords, course.getCurrentHole().location);
         }
+    }
+
+    $scope.initMultiplayer = function() {
+        pubnub.start();
+        pubnub.subscribe("geo", function (m) {
+            if (!$scope.initialized) { return; }
+
+            for (var c in m.players) {
+                if (m.players[c].active && !m.players[c].marker && m.players[c].geo) {
+                    // add a marker, the player is new and has geo coords
+                    m.players[c].marker = mapping.addMarker("dot", m.players[c], m.players[c].geo.coords);
+                } else if (!m.players[c].active && m.players[c].marker) {
+                    // remove a marker, the player is no longer active
+                    mapping.removeMarker(m.players[c].marker);
+                    m.players[c].marker = null;
+                } else if (m.players[c].active && m.players[c].marker) {
+                    // move the already existing marker
+                    mapping.moveMarkerTo(m.players[c].marker, m.players[c].geo.coords);
+                }
+            }
+        });
+
+        pubnub.subscribe("ball", function (m) {
+            console.log($scope.fired)
+            if (!$scope.initialized) { return; }
+            if (m.state == "inplay") { return; }
+            //if ($scope.fired) { console.log("blocked already fired"); return; }
+
+            if (!$scope.ball) {
+                $scope.ball = mapping.addMarker('ball', 'ball');
+                $scope.updateBall();
+            }
+
+            course.getCurrentHole().stroke += 3; // penalty +2 for not hitting the ball yourself!
+            course.refreshScore();
+            state.setState($scope, 'Animating.mapAvailable');
+            $scope.$apply();
+
+           // $scope.fired = true;
+            mapping.animateMarkerBy(
+                $scope.ball, m.power, m.direction, {animation: m.path}, function() {
+                    $scope.updateBall();
+                    state.setState($scope, 'GamePlay.AfterTeeOff.mapAvailable');
+                    $scope.$apply();
+                });
+
+        });
+
+
+        pubnub.subscribe("players", function (m) {
+           // $scope.playerCount = m.playerCount;
+           // $scope.$apply();
+        });
     }
 
     /** call c-tor */

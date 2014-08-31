@@ -2,10 +2,17 @@
     <h1>Geolf</h1>
     <h3>
         <button
-                ng-click="goToGame()"
+                ng-click="goToGame('normal')"
                 class="btn btn-primary btn-geolf">
-            Play Geolf
+            Play Solo Game
         </button>
+
+        <button
+                ng-click="goToGame('war')"
+                class="btn btn-primary btn-geolf">
+            Geolf War! {{playerCount}} player(s)
+        </button>
+
         <button
                 ng-click="goToDrivingRange()"
                 class="btn btn-primary btn-geolf">

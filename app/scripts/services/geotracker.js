@@ -1,5 +1,7 @@
-app.service('geotracker', function() {
+app.service('geotracker', function(pubnub) {
     var self = this;
+
+    this.pubnub = pubnub;
 
     this.config = {
         enableHighAccuracy: true,
@@ -19,18 +21,24 @@ app.service('geotracker', function() {
 
     /**
      * start tracking
-     * @param callback for geoservice update
      * @param optional config to override default
      *
      */
-    this.start = function(config) {
+    this.start = function(config, devmode) {
         if (config) {
             self.config = config;
         }
         if (self.watchID) {
             navigator.geolocation.clearWatch(self.watchID);
         }
-        self.watchID = navigator.geolocation.watchPosition(self.updated, self.error, self.config);
+
+        if (devmode) {
+            navigator.geolocation.getCurrentPosition(function(geo) {
+                var dummygeo = { timestamp: geo.timestamp, coords: { latitude: geo.coords.latitude, longitude: geo.coords.longitude } };
+                self.updated(dummygeo); });
+        } else {
+            self.watchID = navigator.geolocation.watchPosition(self.updated, self.error, self.config);
+        }
     };
 
     /**
@@ -57,6 +65,10 @@ app.service('geotracker', function() {
     this.updated = function(geo) {
         self.accuracy = geo.coords.accuracy;
         self.geo = geo;
+
+        //if (pubnub.active) {
+            self.pubnub.updateGeo(geo);
+        //}
         self.listeners.forEach( function(l) {
             l.apply(this, [geo]);
         });

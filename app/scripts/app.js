@@ -11,7 +11,7 @@ app.config(function ($routeProvider) {
             templateUrl: 'views/drivingrange.html',
             controller: 'DrivingRangeController'
         })
-        .when('/setupgame', {
+        .when('/setupgame/:mode?', {
             templateUrl: 'views/setupgame.html',
             controller: 'SetupGameController'
         })

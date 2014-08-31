@@ -1,5 +1,5 @@
 'use strict';
-app.controller('SetupGameController', function ($scope, $location, geotracker, course, mapping, state) {
+app.controller('SetupGameController', function ($scope, $location, $routeParams, geotracker, course, mapping, state) {
     /**
      * constructor
      */
